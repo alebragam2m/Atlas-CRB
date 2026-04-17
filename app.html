@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atlas CRB · Gestão de Vendas</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>📡 Atlas CRB</h1>
+      <span>Gestão de Vendas</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-section="dashboard">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" data-section="clientes">
+        <span class="icon">👥</span> Clientes
+      </div>
+      <div class="nav-item" data-section="vendas">
+        <span class="icon">💼</span> Vendas
+      </div>
+      <div class="nav-item" data-section="custos">
+        <span class="icon">📋</span> Custos Fixos
+      </div>
+      <div class="nav-item" data-section="projetor">
+        <span class="icon">🔮</span> Projetor de Lucro
+      </div>
+      <div class="nav-item" data-section="fluxo">
+        <span class="icon">💰</span> Fluxo de Caixa
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnLogout">
+        <span>↩</span> <span>Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <section class="section active" id="section-dashboard">
+      <div class="page-header">
+        <h2>Dashboard</h2>
+        <p>Visão geral do negócio</p>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card accent">
+          <div class="kpi-label">Receita Total Projetada</div>
+          <div class="kpi-value" id="dash-kpi-receita">—</div>
+        </div>
+        <div class="kpi-card success">
+          <div class="kpi-label">Lucro Total Bruto</div>
+          <div class="kpi-value" id="dash-kpi-lucro">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Aparelhos Vendidos</div>
+          <div class="kpi-value" id="dash-kpi-aparelhos">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Custo Fixo/Mês</div>
+          <div class="kpi-value" id="dash-kpi-custo">—</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Receita por Mês</h3>
+          <canvas id="dash-chart-barras"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Receita por Cliente</h3>
+          <canvas id="dash-chart-rosca"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:16px;">
+          Resumo Mensal
+        </h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mês</th>
+                <th>Receita Bruta</th>
+                <th>Custos Fixos</th>
+                <th>Receita Líquida</th>
+              </tr>
+            </thead>
+            <tbody id="dash-tbody">
+              <tr><td colspan="4" class="empty-state">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section class="section" id="section-clientes">
+      <div class="page-header">
+        <h2>Clientes</h2>
+        <p>Gerencie sua carteira de clientes</p>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Adicionar Cliente</h3>
+        <div id="clientes-alert" class="alert"></div>
+        <form id="form-cliente">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nome *</label>
+              <input type="text" id="cli-nome" placeholder="Nome do cliente" required />
+            </div>
+            <div class="form-group">
+              <label>Cidade / Estado</label>
+              <input type="text" id="cli-local" placeholder="Ex: São Paulo - SP" />
+            </div>
+            <div class="form-group">
+              <label>Contato</label>
+              <input type="text" id="cli-contato" placeholder="Telefone ou e-mail" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">+ Adicionar Cliente</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Clientes Cadastrados</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Localidade</th>
+                <th>Contato</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="clientes-tbody">
+              <tr><td colspan="4" class="empty-state">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VENDAS -->
+    <section class="section" id="section-vendas">
+      <div class="page-header">
+        <h2>Vendas</h2>
+        <p>Registre vendas e parcelas</p>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Nova Venda</h3>
+        <div id="vendas-alert" class="alert"></div>
+        <form id="form-venda">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Cliente *</label>
+              <select id="venda-cliente" class="select-cliente" required>
+                <option value="">Selecione um cliente...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Data da Venda *</label>
+              <input type="date" id="venda-data" required />
+            </div>
+            <div class="form-group">
+              <label>Quantidade *</label>
+              <input type="number" id="venda-qtd" min="1" placeholder="Ex: 10" required />
+            </div>
+            <div class="form-group">
+              <label>Custo Unitário (R$)</label>
+              <input type="number" id="venda-custo" min="0" step="0.01" placeholder="0,00" />
+            </div>
+            <div class="form-group">
+              <label>Preço de Venda Unit. (R$) *</label>
+              <input type="number" id="venda-preco" min="0.01" step="0.01" placeholder="0,00" required />
+            </div>
+            <div class="form-group">
+              <label>Nº de Parcelas *</label>
+              <select id="venda-parcelas" required>
+                <option value="1">1x (à vista)</option>
+                <option value="2">2x</option>
+                <option value="3">3x</option>
+                <option value="4">4x</option>
+                <option value="5">5x</option>
+                <option value="6">6x</option>
+                <option value="12">12x</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Vencimento 1ª Parcela *</label>
+              <input type="date" id="venda-venc" required />
+            </div>
+            <div class="form-group">
+              <label>Observação</label>
+              <input type="text" id="venda-obs" placeholder="Opcional" />
+            </div>
+          </div>
+
+          <div id="venda-preview" style="display:none;background:#fff8f5;border:1px solid #f0d0c0;border-radius:7px;padding:10px 14px;font-size:13px;color:#c8531a;margin-bottom:14px;font-family:'Fira Code',monospace;"></div>
+
+          <button type="submit" class="btn btn-primary">+ Registrar Venda</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Vendas Registradas</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Qtd</th>
+                <th>Preço Unit.</th>
+                <th>Total</th>
+                <th>Lucro</th>
+                <th>Parcelas</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="vendas-tbody">
+              <tr><td colspan="8" class="empty-state">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOS FIXOS -->
+    <section class="section" id="section-custos">
+      <div class="page-header">
+        <h2>Custos Fixos</h2>
+        <p>Despesas mensais recorrentes</p>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Adicionar Custo</h3>
+        <div id="custos-alert" class="alert"></div>
+        <form id="form-custo">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Descrição *</label>
+              <input type="text" id="custo-nome" placeholder="Ex: Aluguel, Internet..." required />
+            </div>
+            <div class="form-group">
+              <label>Valor Mensal (R$) *</label>
+              <input type="number" id="custo-valor" min="0.01" step="0.01" placeholder="0,00" required />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">+ Adicionar</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div id="custos-lista">
+          <p class="empty-state">Carregando...</p>
+        </div>
+        <hr class="section-divider" />
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:700;font-size:14px;">Total Mensal</span>
+          <span class="money money-red" id="custos-total" style="font-size:20px;font-family:'Fira Code',monospace;font-weight:700;">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJETOR DE LUCRO -->
+    <section class="section" id="section-projetor">
+      <div class="page-header">
+        <h2>Projetor de Lucro</h2>
+        <p>Simule cenários sem salvar no banco</p>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Parâmetros</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Quantidade de Aparelhos</label>
+            <input type="number" id="proj-qtd" min="1" placeholder="Ex: 20" />
+          </div>
+          <div class="form-group">
+            <label>Custo por Aparelho (R$)</label>
+            <input type="number" id="proj-custo" min="0" step="0.01" placeholder="0,00" />
+          </div>
+          <div class="form-group">
+            <label>Preço de Venda (R$)</label>
+            <input type="number" id="proj-preco" min="0.01" step="0.01" placeholder="0,00" />
+          </div>
+          <div class="form-group">
+            <label>Número de Parcelas</label>
+            <select id="proj-parcelas">
+              <option value="1">1x</option>
+              <option value="2">2x</option>
+              <option value="3">3x</option>
+              <option value="4">4x</option>
+              <option value="5">5x</option>
+              <option value="6">6x</option>
+              <option value="12">12x</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mês de Início (1ª Parcela)</label>
+            <input type="month" id="proj-inicio" />
+          </div>
+          <div class="form-group" style="justify-content:flex-end;padding-bottom:4px;">
+            <label>
+              <input type="checkbox" id="proj-desc-custos" /> Descontar custos fixos mensais
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="projetor-resultado" id="proj-resultado-frase">
+        <span id="proj-frase"></span>
+      </div>
+
+      <div id="proj-resultados" style="display:none;">
+        <div class="kpi-grid" style="margin-bottom:20px;">
+          <div class="kpi-card">
+            <div class="kpi-label">Investimento Total</div>
+            <div class="kpi-value" id="proj-kpi-invest">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Receita Bruta Total</div>
+            <div class="kpi-value" id="proj-kpi-bruta">—</div>
+          </div>
+          <div class="kpi-card success">
+            <div class="kpi-label">Lucro Bruto</div>
+            <div class="kpi-value" id="proj-kpi-lucro">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Margem</div>
+            <div class="kpi-value" id="proj-kpi-margem">—</div>
+          </div>
+          <div class="kpi-card accent">
+            <div class="kpi-label">Parcela/Mês (bruta)</div>
+            <div class="kpi-value" id="proj-kpi-parcela">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Receita Líquida/Mês</div>
+            <div class="kpi-value" id="proj-kpi-liquida">—</div>
+          </div>
+        </div>
+
+        <div class="charts-grid" style="margin-bottom:20px;">
+          <div class="chart-card">
+            <h3>Receita Bruta vs Líquida por Mês</h3>
+            <canvas id="proj-chart-barras"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Caixa Acumulado</h3>
+            <canvas id="proj-chart-linha"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:16px;">
+            Projeção Mês a Mês
+          </h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mês</th>
+                  <th>Receita Bruta</th>
+                  <th>Custos Fixos</th>
+                  <th>Receita Líquida</th>
+                  <th>Acumulado</th>
+                </tr>
+              </thead>
+              <tbody id="proj-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLUXO DE CAIXA -->
+    <section class="section" id="section-fluxo">
+      <div class="page-header">
+        <h2>Fluxo de Caixa</h2>
+        <p>Baseado nas parcelas reais cadastradas</p>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card accent">
+          <div class="kpi-label">Receita Total Projetada</div>
+          <div class="kpi-value" id="fluxo-kpi-total">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Melhor Mês</div>
+          <div class="kpi-value" style="font-size:16px;" id="fluxo-kpi-melhor">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Custos Fixos/Mês</div>
+          <div class="kpi-value" id="fluxo-kpi-custos">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Meses com Receita</div>
+          <div class="kpi-value" id="fluxo-kpi-meses">—</div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin:20px 0;">
+        <h3>Receita Mensal</h3>
+        <canvas id="fluxo-chart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:16px;">
+          Timeline por Cliente
+        </h3>
+        <div id="fluxo-timeline">
+          <p class="empty-state">Carregando...</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script type="module">
+  import { supabase } from './supabase.js'
+  import { logout } from './js/auth.js'
+  import { carregarClientes, adicionarCliente } from './js/clientes.js'
+  import { carregarVendas, adicionarVenda, previewVenda } from './js/vendas.js'
+  import { carregarCustos, adicionarCusto } from './js/custos.js'
+  import { initProjetor } from './js/projetor.js'
+  import { carregarFluxo } from './js/fluxo.js'
+  import { carregarDashboard } from './js/dashboard.js'
+
+  // Verifica sessão
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) window.location.href = 'index.html'
+
+  // Navegação
+  const navItems = document.querySelectorAll('.nav-item')
+  const sections = document.querySelectorAll('.section')
+
+  navItems.forEach(item => {
+    item.addEventListener('click', async () => {
+      const target = item.dataset.section
+      navItems.forEach(n => n.classList.remove('active'))
+      sections.forEach(s => s.classList.remove('active'))
+      item.classList.add('active')
+      document.getElementById(`section-${target}`).classList.add('active')
+
+      // Carrega dados ao mudar de aba
+      if (target === 'dashboard') await carregarDashboard()
+      if (target === 'clientes') await carregarClientes()
+      if (target === 'vendas') { await carregarClientes(); await carregarVendas() }
+      if (target === 'custos') await carregarCustos()
+      if (target === 'fluxo') await carregarFluxo()
+    })
+  })
+
+  // Logout
+  document.getElementById('btnLogout').addEventListener('click', logout)
+
+  // Form: Clientes
+  document.getElementById('form-cliente').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const nome = document.getElementById('cli-nome').value
+    const local = document.getElementById('cli-local').value
+    const contato = document.getElementById('cli-contato').value
+    const ok = await adicionarCliente(nome, local, contato)
+    if (ok) e.target.reset()
+  })
+
+  // Form: Vendas + preview
+  const vendaInputs = ['venda-qtd', 'venda-custo', 'venda-preco', 'venda-parcelas']
+  vendaInputs.forEach(id => document.getElementById(id)?.addEventListener('input', previewVenda))
+
+  document.getElementById('form-venda').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const dados = {
+      cliente_id: document.getElementById('venda-cliente').value,
+      data: document.getElementById('venda-data').value,
+      qtd: document.getElementById('venda-qtd').value,
+      custo_unit: document.getElementById('venda-custo').value,
+      preco_unit: document.getElementById('venda-preco').value,
+      num_parcelas: document.getElementById('venda-parcelas').value,
+      venc_primeira: document.getElementById('venda-venc').value,
+      obs: document.getElementById('venda-obs').value
+    }
+    const ok = await adicionarVenda(dados)
+    if (ok) {
+      e.target.reset()
+      document.getElementById('venda-preview').style.display = 'none'
+    }
+  })
+
+  // Form: Custos
+  document.getElementById('form-custo').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const nome = document.getElementById('custo-nome').value
+    const valor = document.getElementById('custo-valor').value
+    const ok = await adicionarCusto(nome, valor)
+    if (ok) e.target.reset()
+  })
+
+  // Init projetor
+  initProjetor()
+
+  // Carrega dashboard ao iniciar
+  await carregarDashboard()
+</script>
+</body>
+</html>
