@@ -31,6 +31,46 @@ function renderizarLotes(lotes) {
     return
   }
 
+  const rows = lotes.map(l => {
+    const total = l.aparelhos?.length || 0
+    const vendidos = l.aparelhos?.filter(a => a.status === 'vendido').length || 0
+    const disp = total - vendidos
+    const nomeSafe = escapeHtml(l.nome_produto).replace(/'/g, "\\'")
+
+    return `
+      <tr>
+        <td><strong>${escapeHtml(l.nome_produto)}</strong></td>
+        <td>${formatarData(l.data_entrada)}</td>
+        <td class="money">${fm(l.custo_unit)}</td>
+        <td>${total}</td>
+        <td><span style="color:var(--success);font-weight:700;">${disp}</span></td>
+        <td><span style="color:var(--text-muted);">${vendidos}</span></td>
+        <td>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm"
+              onclick="window._ativarLote('${l.id}', '${nomeSafe}')">
+              + Escanear
+            </button>
+            <button class="btn btn-sm" style="background:#f0ede6;border:1px solid var(--border);color:var(--text);"
+              onclick="window._verAparelhos('${l.id}')">
+              Ver (${total})
+            </button>
+            <button class="btn btn-danger btn-sm"
+              onclick="window._removerLote('${l.id}', ${total})">
+              Excluir
+            </button>
+          </div>
+        </td>
+      </tr>
+      <tr id="aparelhos-row-${l.id}" style="display:none;">
+        <td colspan="7" style="padding:0;background:#faf8f4;">
+          <div id="aparelhos-content-${l.id}" style="padding:14px 16px;">
+            Carregando...
+          </div>
+        </td>
+      </tr>`
+  }).join('')
+
   cont.innerHTML = `
     <div class="table-wrap">
       <table>
@@ -45,28 +85,7 @@ function renderizarLotes(lotes) {
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          ${lotes.map(l => {
-            const total = l.aparelhos?.length || 0
-            const vendidos = l.aparelhos?.filter(a => a.status === 'vendido').length || 0
-            const disp = total - vendidos
-            return `
-              <tr>
-                <td><strong>${escapeHtml(l.nome_produto)}</strong></td>
-                <td>${formatarData(l.data_entrada)}</td>
-                <td class="money">${fm(l.custo_unit)}</td>
-                <td>${total}</td>
-                <td><span style="color:var(--success);font-weight:700;">${disp}</span></td>
-                <td><span style="color:var(--text-muted);">${vendidos}</span></td>
-                <td>
-                  <button class="btn btn-primary btn-sm"
-                    onclick="window._ativarLote('${l.id}', '${escapeHtml(l.nome_produto).replace(/'/g,"\\'")}')">
-                    Escanear Entrada
-                  </button>
-                </td>
-              </tr>`
-          }).join('')}
-        </tbody>
+        <tbody>${rows}</tbody>
       </table>
     </div>
   `
@@ -86,7 +105,121 @@ export async function criarLote(nome, data, custoUnit) {
 
   mostrarAlerta('estoque-alert', `Lote "${nome}" criado! Agora escaneie os aparelhos.`, 'success')
   await carregarEstoque()
+  await popularDatalistProdutos()
   return lote
+}
+
+export async function removerLote(id, totalAparelhos) {
+  const msg = totalAparelhos > 0
+    ? `Excluir este lote? Os ${totalAparelhos} aparelhos vinculados também serão excluídos.`
+    : 'Excluir este lote?'
+
+  if (!confirm(msg)) return
+
+  const { error } = await supabase.from('lotes').delete().eq('id', id)
+
+  if (error) {
+    mostrarAlerta('estoque-alert', 'Erro ao excluir lote: ' + error.message, 'error')
+    return
+  }
+
+  mostrarAlerta('estoque-alert', 'Lote excluído.', 'success')
+  await carregarEstoque()
+}
+
+// ── APARELHOS ─────────────────────────────────────────────────────────────────
+
+export async function verAparelhos(loteId) {
+  const row = document.getElementById(`aparelhos-row-${loteId}`)
+  const content = document.getElementById(`aparelhos-content-${loteId}`)
+  if (!row) return
+
+  // Toggle
+  if (row.style.display !== 'none') {
+    row.style.display = 'none'
+    return
+  }
+
+  row.style.display = 'table-row'
+  content.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Carregando...</p>'
+
+  const { data, error } = await supabase
+    .from('aparelhos')
+    .select('*, vendas(data, clientes(nome))')
+    .eq('lote_id', loteId)
+    .order('created_at')
+
+  if (error || !data) {
+    content.innerHTML = '<p style="color:var(--danger);">Erro ao carregar aparelhos.</p>'
+    return
+  }
+
+  if (!data.length) {
+    content.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Nenhum aparelho cadastrado neste lote ainda.</p>'
+    return
+  }
+
+  content.innerHTML = `
+    <table style="font-size:13px;width:100%;">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Status</th>
+          <th>Venda vinculada</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(a => `
+          <tr>
+            <td style="font-family:'Fira Code',monospace;">${escapeHtml(a.codigo)}</td>
+            <td>${a.status === 'vendido'
+              ? '<span style="background:#f0f0f0;color:var(--text-muted);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Vendido</span>'
+              : '<span style="background:#d4edda;color:#155724;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">Disponível</span>'
+            }</td>
+            <td style="font-size:12px;color:var(--text-muted);">
+              ${a.vendas ? `${formatarData(a.vendas.data)} — ${escapeHtml(a.vendas.clientes?.nome || '?')}` : '—'}
+            </td>
+            <td>
+              <button class="btn btn-danger" style="padding:3px 9px;font-size:11px;"
+                onclick="window._removerAparelho('${a.id}', '${loteId}', '${a.status}')">
+                Excluir
+              </button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `
+}
+
+export async function removerAparelho(id, loteId, status) {
+  const msg = status === 'vendido'
+    ? 'Este aparelho já foi vendido. Excluir mesmo assim? A venda associada não será afetada.'
+    : 'Excluir este aparelho do estoque?'
+
+  if (!confirm(msg)) return
+
+  const { error } = await supabase.from('aparelhos').delete().eq('id', id)
+
+  if (error) {
+    mostrarAlerta('estoque-alert', 'Erro ao excluir aparelho: ' + error.message, 'error')
+    return
+  }
+
+  await carregarEstoque()
+  // Reabre o painel do lote
+  setTimeout(() => verAparelhos(loteId), 200)
+}
+
+// ── DATALIST DE PRODUTOS (para vendas) ───────────────────────────────────────
+
+export async function popularDatalistProdutos() {
+  const { data } = await supabase.from('lotes').select('nome_produto').order('nome_produto')
+  const datalist = document.getElementById('produtos-list')
+  if (!datalist || !data) return
+  const nomes = [...new Set(data.map(l => l.nome_produto))]
+  datalist.innerHTML = nomes.map(n => `<option value="${escapeHtml(n)}">`).join('')
 }
 
 // ── ENTRADAS ─────────────────────────────────────────────────────────────────
@@ -102,11 +235,11 @@ export function ativarLote(id, nome) {
   }
 
   document.getElementById('painel-entrada').style.display = 'block'
-  document.getElementById('codigo-manual-entrada').focus()
 
-  // Limpa lista de escaneados anteriores
   const lista = document.getElementById('codigos-escaneados')
   if (lista) lista.innerHTML = ''
+
+  document.getElementById('codigo-manual-entrada').focus()
 }
 
 export async function registrarAparelho(codigo) {
@@ -118,7 +251,6 @@ export async function registrarAparelho(codigo) {
   const cod = codigo.trim()
   if (!cod) return false
 
-  // Verifica duplicata
   const { data: exist } = await supabase
     .from('aparelhos')
     .select('id, lotes(nome_produto)')
@@ -126,7 +258,7 @@ export async function registrarAparelho(codigo) {
     .maybeSingle()
 
   if (exist) {
-    mostrarAlerta('estoque-alert', `"${cod}" já está cadastrado no lote: ${exist.lotes?.nome_produto || '?'}.`, 'error')
+    mostrarAlerta('estoque-alert', `"${cod}" já cadastrado no lote: ${exist.lotes?.nome_produto || '?'}.`, 'error')
     return false
   }
 
@@ -153,16 +285,14 @@ function adicionarNaListaEntrada(codigo) {
   lista.prepend(item)
 }
 
-// ── SCANNER CÂMERA: ENTRADA ───────────────────────────────────────────────────
+// ── SCANNER: ENTRADA ─────────────────────────────────────────────────────────
 
 export function iniciarScannerEntrada() {
   if (!loteAtivoId) { alert('Selecione um lote primeiro.'); return }
   if (!window.Html5Qrcode) { alert('Scanner não carregado.'); return }
 
-  const divId = 'qr-reader-entrada'
-  document.getElementById(divId).style.display = 'block'
-
-  html5QrEntrada = new window.Html5Qrcode(divId)
+  document.getElementById('qr-reader-entrada').style.display = 'block'
+  html5QrEntrada = new window.Html5Qrcode('qr-reader-entrada')
   html5QrEntrada.start(
     { facingMode: 'environment' },
     { fps: 10, qrbox: { width: 280, height: 130 } },
@@ -185,7 +315,7 @@ export function pararScannerEntrada() {
   document.getElementById('btn-stop-scanner-entrada').style.display = 'none'
 }
 
-// ── SAÍDAS ────────────────────────────────────────────────────────────────────
+// ── SAÍDAS ───────────────────────────────────────────────────────────────────
 
 export async function buscarAparelhoPorCodigo(codigo) {
   const cod = codigo.trim()
@@ -212,7 +342,6 @@ export async function buscarAparelhoPorCodigo(codigo) {
 
   aparelhoEscaneado = data
 
-  // Busca vendas recentes para associar
   const { data: vendas } = await supabase
     .from('vendas')
     .select('id, data, qtd, clientes(nome)')
@@ -226,7 +355,7 @@ export async function buscarAparelhoPorCodigo(codigo) {
           <p style="font-weight:700;font-size:16px;">${escapeHtml(data.lotes?.nome_produto || '—')}</p>
           <p style="font-size:12px;color:var(--text-muted);margin-top:3px;">
             Código: <code style="font-family:'Fira Code',monospace;">${escapeHtml(data.codigo)}</code>
-            &nbsp;·&nbsp; Lote entrada: ${formatarData(data.lotes?.data_entrada)}
+            &nbsp;·&nbsp; Entrada: ${formatarData(data.lotes?.data_entrada)}
             &nbsp;·&nbsp; Custo: ${fm(data.lotes?.custo_unit || 0)}
           </p>
         </div>
@@ -269,15 +398,13 @@ export async function confirmarSaida() {
   await carregarEstoque()
 }
 
-// ── SCANNER CÂMERA: SAÍDA ────────────────────────────────────────────────────
+// ── SCANNER: SAÍDA ───────────────────────────────────────────────────────────
 
 export function iniciarScannerSaida() {
   if (!window.Html5Qrcode) { alert('Scanner não carregado.'); return }
 
-  const divId = 'qr-reader-saida'
-  document.getElementById(divId).style.display = 'block'
-
-  html5QrSaida = new window.Html5Qrcode(divId)
+  document.getElementById('qr-reader-saida').style.display = 'block'
+  html5QrSaida = new window.Html5Qrcode('qr-reader-saida')
   html5QrSaida.start(
     { facingMode: 'environment' },
     { fps: 10, qrbox: { width: 280, height: 130 } },
@@ -326,6 +453,9 @@ function mostrarAlerta(id, msg, tipo) {
   setTimeout(() => el.classList.remove('show'), 5000)
 }
 
-// Globais
-window._ativarLote = ativarLote
-window._confirmarSaida = confirmarSaida
+// ── GLOBAIS ──────────────────────────────────────────────────────────────────
+window._ativarLote         = ativarLote
+window._confirmarSaida     = confirmarSaida
+window._removerLote        = removerLote
+window._verAparelhos       = verAparelhos
+window._removerAparelho    = removerAparelho

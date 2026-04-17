@@ -174,12 +174,17 @@
         <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Nova Venda</h3>
         <div id="vendas-alert" class="alert"></div>
         <form id="form-venda">
+          <datalist id="produtos-list"></datalist>
           <div class="form-grid">
             <div class="form-group">
               <label>Cliente *</label>
               <select id="venda-cliente" class="select-cliente" required>
                 <option value="">Selecione um cliente...</option>
               </select>
+            </div>
+            <div class="form-group">
+              <label>Produto *</label>
+              <input type="text" id="venda-produto" list="produtos-list" placeholder="Selecione ou digite o produto" required />
             </div>
             <div class="form-group">
               <label>Data da Venda *</label>
@@ -233,6 +238,7 @@
               <tr>
                 <th>Data</th>
                 <th>Cliente</th>
+                <th>Produto</th>
                 <th>Qtd</th>
                 <th>Preço Unit.</th>
                 <th>Total</th>
@@ -570,7 +576,8 @@
     carregarEstoque, criarLote, ativarLote,
     registrarAparelho, buscarAparelhoPorCodigo, confirmarSaida,
     iniciarScannerEntrada, pararScannerEntrada,
-    iniciarScannerSaida, pararScannerSaida
+    iniciarScannerSaida, pararScannerSaida,
+    popularDatalistProdutos
   } from './js/estoque.js'
 
   window._iniciarScannerEntrada = iniciarScannerEntrada
@@ -608,7 +615,7 @@
       // Carrega dados ao mudar de aba
       if (target === 'dashboard') await carregarDashboard()
       if (target === 'clientes') await carregarClientes()
-      if (target === 'vendas') { await carregarClientes(); await carregarVendas() }
+      if (target === 'vendas') { await carregarClientes(); await carregarVendas(); await popularDatalistProdutos() }
       if (target === 'custos') await carregarCustos()
       if (target === 'fluxo') await carregarFluxo()
       if (target === 'estoque') await carregarEstoque()
@@ -637,6 +644,7 @@
     e.preventDefault()
     const dados = {
       cliente_id: document.getElementById('venda-cliente').value,
+      produto: document.getElementById('venda-produto').value,
       data: document.getElementById('venda-data').value,
       qtd: document.getElementById('venda-qtd').value,
       custo_unit: document.getElementById('venda-custo').value,

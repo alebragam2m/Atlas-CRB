@@ -19,7 +19,7 @@ function renderizarVendas(lista) {
   if (!tbody) return
 
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Nenhuma venda cadastrada.</td></tr>'
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Nenhuma venda cadastrada.</td></tr>'
     return
   }
 
@@ -27,13 +27,14 @@ function renderizarVendas(lista) {
     <tr>
       <td>${formatarData(v.data)}</td>
       <td>${escapeHtml(v.clientes?.nome || '—')}</td>
+      <td>${escapeHtml(v.produto || '—')}</td>
       <td>${v.qtd}</td>
       <td class="money">${formatarMoeda(v.preco_unit)}</td>
       <td class="money">${formatarMoeda(v.total)}</td>
       <td class="money money-green">${formatarMoeda(v.lucro)}</td>
       <td>${v.num_parcelas}x de ${formatarMoeda(v.valor_parcela)}</td>
       <td>
-        <button class="btn btn-danger" onclick="window._removerVenda('${v.id}')">Remover</button>
+        <button class="btn btn-danger" onclick="window._removerVenda('${v.id}')">Excluir</button>
       </td>
     </tr>
   `).join('')
@@ -48,6 +49,7 @@ export async function adicionarVenda(dados) {
   const vendaPayload = {
     cliente_id: dados.cliente_id,
     data: dados.data,
+    produto: dados.produto || '',
     qtd: Number(dados.qtd),
     custo_unit: Number(dados.custo_unit || 0),
     preco_unit: Number(dados.preco_unit),
