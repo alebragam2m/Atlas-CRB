@@ -43,14 +43,11 @@ export function renderizarClientes(lista) {
 }
 
 export async function adicionarCliente(nome, nomeContato, local, contato) {
-  const { data: { user } } = await supabase.auth.getUser()
-
   const { error } = await supabase.from('clientes').insert({
     nome: nome.trim(),
     nome_contato: nomeContato.trim(),
     local: local.trim(),
-    contato: contato.trim(),
-    created_by: user.id
+    contato: contato.trim()
   })
 
   if (error) {

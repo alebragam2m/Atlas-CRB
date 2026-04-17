@@ -51,12 +51,9 @@ function renderizarCustos(lista) {
 }
 
 export async function adicionarCusto(nome, valor) {
-  const { data: { user } } = await supabase.auth.getUser()
-
   const { error } = await supabase.from('custos_fixos').insert({
     nome: nome.trim(),
-    valor: Number(valor),
-    created_by: user.id
+    valor: Number(valor)
   })
 
   if (error) {

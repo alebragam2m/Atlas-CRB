@@ -40,8 +40,6 @@ function renderizarVendas(lista) {
 }
 
 export async function adicionarVenda(dados) {
-  const { data: { user } } = await supabase.auth.getUser()
-
   const total = dados.qtd * dados.preco_unit
   const custo_total = dados.qtd * (dados.custo_unit || 0)
   const lucro = total - custo_total
@@ -58,8 +56,7 @@ export async function adicionarVenda(dados) {
     num_parcelas: Number(dados.num_parcelas),
     valor_parcela: Number(valor_parcela.toFixed(2)),
     venc_primeira: dados.venc_primeira,
-    obs: dados.obs || '',
-    created_by: user.id
+    obs: dados.obs || ''
   }
 
   const { data: venda, error: erroVenda } = await supabase
