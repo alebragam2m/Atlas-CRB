@@ -6,6 +6,7 @@
   <title>Atlas CRB · Gestão de Vendas</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 <div class="app-layout">
@@ -34,6 +35,9 @@
       </div>
       <div class="nav-item" data-section="fluxo">
         <span class="icon">💰</span> Fluxo de Caixa
+      </div>
+      <div class="nav-item" data-section="estoque">
+        <span class="icon">📦</span> Estoque
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -437,6 +441,113 @@
   </main>
 </div>
 
+    <!-- ESTOQUE -->
+    <section class="section" id="section-estoque">
+      <div class="page-header">
+        <h2>Estoque</h2>
+        <p>Controle de lotes e aparelhos individuais</p>
+      </div>
+
+      <!-- TABS -->
+      <div class="estoque-tabs">
+        <button class="etab active" data-tab="etab-lotes">Lotes / Entradas</button>
+        <button class="etab" data-tab="etab-saidas">Dar Baixa (Saída)</button>
+      </div>
+
+      <!-- TAB: LOTES / ENTRADAS -->
+      <div id="etab-lotes" class="etab-content active">
+        <div id="estoque-alert" class="alert"></div>
+
+        <!-- Criar novo lote -->
+        <div class="card" style="margin-bottom:20px;">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Novo Lote de Entrada</h3>
+          <form id="form-lote">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Produto *</label>
+                <input type="text" id="lote-nome" placeholder="Ex: Rastreador ST-900" required />
+              </div>
+              <div class="form-group">
+                <label>Data de Entrada *</label>
+                <input type="date" id="lote-data" required />
+              </div>
+              <div class="form-group">
+                <label>Custo Unitário (R$) *</label>
+                <input type="number" id="lote-custo" min="0" step="0.01" placeholder="0,00" required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">+ Criar Lote</button>
+          </form>
+        </div>
+
+        <!-- Painel de escaneamento -->
+        <div id="painel-entrada" style="display:none;" class="card" style="margin-bottom:20px;">
+          <div id="lote-ativo-info" style="display:none;background:#fff0e8;color:var(--accent);border-radius:7px;padding:9px 14px;font-weight:600;font-size:13px;margin-bottom:16px;"></div>
+
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">Registrar Aparelhos no Lote</h3>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+            <button id="btn-start-scanner-entrada" class="btn btn-primary" onclick="window._iniciarScannerEntrada()">
+              📷 Usar Câmera
+            </button>
+            <button id="btn-stop-scanner-entrada" class="btn btn-primary" style="display:none;background:var(--danger);" onclick="window._pararScannerEntrada()">
+              ⏹ Parar Câmera
+            </button>
+          </div>
+
+          <div id="qr-reader-entrada" style="display:none;max-width:340px;margin-bottom:14px;border-radius:8px;overflow:hidden;"></div>
+
+          <div id="estoque-entrada-manual" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+            <div class="form-group" style="flex:1;min-width:200px;margin:0;">
+              <label>Ou digite / cole o código</label>
+              <input type="text" id="codigo-manual-entrada" placeholder="Código de barras ou QR" autocomplete="off" />
+            </div>
+            <button class="btn btn-primary" onclick="window._registrarManual()">Registrar</button>
+          </div>
+
+          <div id="codigos-escaneados" style="display:flex;flex-direction:column;gap:6px;margin-top:16px;max-height:220px;overflow-y:auto;"></div>
+        </div>
+
+        <!-- Lista de lotes -->
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Lotes Cadastrados</h3>
+          <div id="estoque-lista">
+            <p class="empty-state">Carregando...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SAÍDAS -->
+      <div id="etab-saidas" class="etab-content" style="display:none;">
+        <div id="estoque-alert-saida" class="alert"></div>
+
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">Escanear Aparelho para Saída</h3>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+            <button id="btn-start-scanner-saida" class="btn btn-primary" onclick="window._iniciarScannerSaida()">
+              📷 Usar Câmera
+            </button>
+            <button id="btn-stop-scanner-saida" class="btn btn-primary" style="display:none;background:var(--danger);" onclick="window._pararScannerSaida()">
+              ⏹ Parar Câmera
+            </button>
+          </div>
+
+          <div id="qr-reader-saida" style="display:none;max-width:340px;margin-bottom:14px;border-radius:8px;overflow:hidden;"></div>
+
+          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+            <div class="form-group" style="flex:1;min-width:200px;margin:0;">
+              <label>Ou digite / cole o código</label>
+              <input type="text" id="codigo-manual-saida" placeholder="Código do aparelho" autocomplete="off" />
+            </div>
+            <button class="btn btn-primary" onclick="window._buscarManualSaida()">Buscar</button>
+          </div>
+
+          <div id="saida-resultado"></div>
+        </div>
+      </div>
+    </section>
+
 <!-- MODAL FICHA DO CLIENTE -->
 <div id="modal-ficha" class="modal-overlay" onclick="if(event.target===this)window._fecharFichaCliente()">
   <div class="modal-box">
@@ -455,6 +566,28 @@
   import { initProjetor } from './js/projetor.js'
   import { carregarFluxo } from './js/fluxo.js'
   import { carregarDashboard } from './js/dashboard.js'
+  import {
+    carregarEstoque, criarLote, ativarLote,
+    registrarAparelho, buscarAparelhoPorCodigo, confirmarSaida,
+    iniciarScannerEntrada, pararScannerEntrada,
+    iniciarScannerSaida, pararScannerSaida
+  } from './js/estoque.js'
+
+  window._iniciarScannerEntrada = iniciarScannerEntrada
+  window._pararScannerEntrada   = pararScannerEntrada
+  window._iniciarScannerSaida   = iniciarScannerSaida
+  window._pararScannerSaida     = pararScannerSaida
+  window._registrarManual = async () => {
+    const input = document.getElementById('codigo-manual-entrada')
+    if (!input.value.trim()) return
+    const ok = await registrarAparelho(input.value)
+    if (ok) input.value = ''
+    input.focus()
+  }
+  window._buscarManualSaida = async () => {
+    const input = document.getElementById('codigo-manual-saida')
+    await buscarAparelhoPorCodigo(input.value)
+  }
 
   // Verifica sessão
   const { data: { session } } = await supabase.auth.getSession()
@@ -478,6 +611,7 @@
       if (target === 'vendas') { await carregarClientes(); await carregarVendas() }
       if (target === 'custos') await carregarCustos()
       if (target === 'fluxo') await carregarFluxo()
+      if (target === 'estoque') await carregarEstoque()
     })
   })
 
@@ -525,6 +659,48 @@
     const valor = document.getElementById('custo-valor').value
     const ok = await adicionarCusto(nome, valor)
     if (ok) e.target.reset()
+  })
+
+  // Form: Lote
+  document.getElementById('form-lote').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const nome = document.getElementById('lote-nome').value
+    const data = document.getElementById('lote-data').value
+    const custo = document.getElementById('lote-custo').value
+    const lote = await criarLote(nome, data, custo)
+    if (lote) {
+      e.target.reset()
+      ativarLote(lote.id, lote.nome_produto)
+    }
+  })
+
+  // Enter no input manual de entrada
+  document.getElementById('codigo-manual-entrada')?.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const input = e.target
+      if (!input.value.trim()) return
+      const ok = await registrarAparelho(input.value)
+      if (ok) input.value = ''
+    }
+  })
+
+  // Enter no input manual de saída
+  document.getElementById('codigo-manual-saida')?.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      await buscarAparelhoPorCodigo(e.target.value)
+    }
+  })
+
+  // Tabs do estoque
+  document.querySelectorAll('.etab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.etab').forEach(b => b.classList.remove('active'))
+      document.querySelectorAll('.etab-content').forEach(c => c.style.display = 'none')
+      btn.classList.add('active')
+      document.getElementById(btn.dataset.tab).style.display = 'block'
+    })
   })
 
   // Init projetor

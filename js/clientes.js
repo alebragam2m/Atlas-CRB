@@ -90,10 +90,10 @@ export async function abrirFichaCliente(id) {
     .eq('id', id)
     .single()
 
-  // Busca vendas com parcelas
+  // Busca vendas com parcelas e aparelhos (com info do lote)
   const { data: vendas, error: erroVendas } = await supabase
     .from('vendas')
-    .select('*, parcelas(*)')
+    .select('*, parcelas(*), aparelhos(codigo, lotes(nome_produto, data_entrada))')
     .eq('cliente_id', id)
     .order('data', { ascending: false })
 
@@ -110,9 +110,21 @@ export async function abrirFichaCliente(id) {
     const pagas = parcelas.filter(p => p.mes_ano <= mesAtual).length
     const status = calcularStatus(pagas, total)
 
+    // Aparelhos com lote
+    const aparelhos = v.aparelhos || []
+    const lotesUnicos = [...new Set(aparelhos.map(a => a.lotes?.nome_produto).filter(Boolean))]
+    const loteInfo = lotesUnicos.length
+      ? `<div style="margin-top:5px;font-size:11px;color:var(--text-muted);">
+           📦 ${aparelhos.length} aparelho${aparelhos.length !== 1 ? 's' : ''} — Lote: ${escapeHtml(lotesUnicos.join(', '))}
+         </div>`
+      : ''
+
     return `
       <tr>
-        <td>${formatarData(v.data)}</td>
+        <td>
+          ${formatarData(v.data)}
+          ${loteInfo}
+        </td>
         <td>${v.qtd} un.</td>
         <td class="money">${fm(v.preco_unit)}</td>
         <td class="money">${fm(v.total)}</td>

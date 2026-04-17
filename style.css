@@ -480,6 +480,60 @@ tbody tr:hover td { background: #faf8f4; }
 
 .badge-orange { background: #fff0e8; color: var(--accent); }
 
+/* ── ESTOQUE TABS ── */
+.estoque-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px;
+  width: fit-content;
+}
+
+.etab {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.etab.active {
+  background: var(--accent);
+  color: white;
+}
+
+.etab:hover:not(.active) {
+  background: #f0ede6;
+  color: var(--text);
+}
+
+.etab-content { display: none; }
+.etab-content.active { display: block; }
+
+/* ── CÓDIGOS ESCANEADOS ── */
+.codigo-item {
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.codigo-item.entrada {
+  background: #d4edda;
+  color: #155724;
+}
+
 /* ── MODAL FICHA ── */
 .modal-overlay {
   display: none;
