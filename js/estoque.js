@@ -1,4 +1,5 @@
 import { supabase } from '../supabase.js'
+import { calcularCustoUnitario, buscarCotacaoDolar } from './tributario.js'
 
 let loteAtivoId = null
 let loteAtivoNome = null
@@ -91,10 +92,53 @@ function renderizarLotes(lotes) {
   `
 }
 
-export async function criarLote(nome, data, custoUnit) {
+export async function criarLote(nome, data, qtdLote, params) {
+  let payload = {
+    nome_produto: nome.trim(),
+    data_entrada: data,
+    qtd_lote: qtdLote,
+    tem_import: false,
+    custo_unit: params.custo_unit || 0,
+    custo_unitario_real: params.custo_unit || 0,
+  }
+
+  if (params.ehImport) {
+    const custoReal = calcularCustoUnitario({
+      custoFOB_USD:            params.custoFOB_USD,
+      freteInternacional_USD:  params.freteInternacional_USD,
+      seguroInternacional_USD: params.seguroInternacional_USD,
+      taxaCambio:              params.taxaCambio,
+      aliqII:                  params.aliqII,
+      aliqIPI:                 params.aliqIPI,
+      aliqPIS:                 params.aliqPIS,
+      aliqCOFINS:              params.aliqCOFINS,
+      aliqICMS:                params.aliqICMS,
+      custosOpLote:            params.custosOpLote,
+      qtdLote,
+    })
+
+    payload = {
+      ...payload,
+      tem_import:             true,
+      custo_fob_usd:          params.custoFOB_USD,
+      frete_intl_usd:         params.freteInternacional_USD,
+      seguro_intl_usd:        params.seguroInternacional_USD,
+      taxa_cambio:            params.taxaCambio,
+      aliq_ii:                params.aliqII,
+      aliq_ipi:               params.aliqIPI,
+      aliq_pis:               params.aliqPIS,
+      aliq_cofins:            params.aliqCOFINS,
+      aliq_icms:              params.aliqICMS,
+      custos_op_lote:         params.custosOpLote,
+      aliq_simples:           params.aliqSimples,
+      custo_unit:             Number(custoReal.toFixed(4)),
+      custo_unitario_real:    Number(custoReal.toFixed(4)),
+    }
+  }
+
   const { data: lote, error } = await supabase
     .from('lotes')
-    .insert({ nome_produto: nome.trim(), data_entrada: data, custo_unit: Number(custoUnit) })
+    .insert(payload)
     .select()
     .single()
 
@@ -103,10 +147,59 @@ export async function criarLote(nome, data, custoUnit) {
     return null
   }
 
-  mostrarAlerta('estoque-alert', `Lote "${nome}" criado! Agora escaneie os aparelhos.`, 'success')
+  mostrarAlerta('estoque-alert', `Lote "${nome}" criado! Custo real: R$ ${Number(payload.custo_unitario_real).toFixed(2)}/un`, 'success')
   await carregarEstoque()
-  await popularDatalistProdutos()
   return lote
+}
+
+// Preview do custo do lote em tempo real (chamado pelo oninput dos campos)
+export function previewCustoLote() {
+  const v = (id) => Number(document.getElementById(id)?.value || 0)
+  const qtd = v('lote-qtd')
+  if (!qtd) return
+
+  try {
+    const custo = calcularCustoUnitario({
+      custoFOB_USD:            v('lote-fob'),
+      freteInternacional_USD:  v('lote-frete'),
+      seguroInternacional_USD: v('lote-seguro'),
+      taxaCambio:              v('lote-cambio'),
+      aliqII:    v('lote-ii') / 100,
+      aliqIPI:   v('lote-ipi') / 100,
+      aliqPIS:   v('lote-pis') / 100,
+      aliqCOFINS:v('lote-cofins') / 100,
+      aliqICMS:  v('lote-icms') / 100,
+      custosOpLote: v('lote-custos-op'),
+      qtdLote: qtd,
+    })
+
+    const previewEl = document.getElementById('lote-custo-preview')
+    const contentEl = document.getElementById('lote-custo-preview-content')
+    if (!previewEl || !contentEl || !custo) return
+
+    previewEl.style.display = 'block'
+    contentEl.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:2px solid var(--accent);">
+        <span style="font-weight:700;font-size:14px;">Custo unitário real calculado</span>
+        <span style="font-size:20px;font-weight:700;color:var(--accent);">R$ ${custo.toFixed(2)}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
+        Custo total do lote (${qtd} un.): R$ ${(custo * qtd).toFixed(2)}
+      </div>
+    `
+  } catch { /* campos incompletos */ }
+}
+
+export async function buscarCambioHoje() {
+  const btn = document.querySelector('[onclick="window._buscarCambio()"]')
+  if (btn) btn.textContent = 'Buscando...'
+  const cotacao = await buscarCotacaoDolar()
+  const input = document.getElementById('lote-cambio')
+  if (input && cotacao) {
+    input.value = cotacao.toFixed(4)
+    previewCustoLote()
+  }
+  if (btn) btn.textContent = 'BCB hoje'
 }
 
 export async function removerLote(id, totalAparelhos) {
@@ -210,16 +303,6 @@ export async function removerAparelho(id, loteId, status) {
   await carregarEstoque()
   // Reabre o painel do lote
   setTimeout(() => verAparelhos(loteId), 200)
-}
-
-// ── DATALIST DE PRODUTOS (para vendas) ───────────────────────────────────────
-
-export async function popularDatalistProdutos() {
-  const { data } = await supabase.from('lotes').select('nome_produto').order('nome_produto')
-  const datalist = document.getElementById('produtos-list')
-  if (!datalist || !data) return
-  const nomes = [...new Set(data.map(l => l.nome_produto))]
-  datalist.innerHTML = nomes.map(n => `<option value="${escapeHtml(n)}">`).join('')
 }
 
 // ── ENTRADAS ─────────────────────────────────────────────────────────────────

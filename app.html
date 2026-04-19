@@ -174,7 +174,6 @@
         <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Nova Venda</h3>
         <div id="vendas-alert" class="alert"></div>
         <form id="form-venda">
-          <datalist id="produtos-list"></datalist>
           <div class="form-grid">
             <div class="form-group">
               <label>Cliente *</label>
@@ -183,8 +182,10 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Produto *</label>
-              <input type="text" id="venda-produto" list="produtos-list" placeholder="Selecione ou digite o produto" required />
+              <label>Lote / Produto *</label>
+              <select id="venda-lote" required onchange="window._selecionarLote(this.value)">
+                <option value="">Selecione o lote...</option>
+              </select>
             </div>
             <div class="form-group">
               <label>Data da Venda *</label>
@@ -195,8 +196,8 @@
               <input type="number" id="venda-qtd" min="1" placeholder="Ex: 10" required />
             </div>
             <div class="form-group">
-              <label>Custo Unitário (R$)</label>
-              <input type="number" id="venda-custo" min="0" step="0.01" placeholder="0,00" />
+              <label>Custo Unit. Real (R$)</label>
+              <input type="number" id="venda-custo" min="0" step="0.01" placeholder="0,00" style="background:#f5f2eb;" readonly />
             </div>
             <div class="form-group">
               <label>Preço de Venda Unit. (R$) *</label>
@@ -224,7 +225,8 @@
             </div>
           </div>
 
-          <div id="venda-preview" style="display:none;background:#fff8f5;border:1px solid #f0d0c0;border-radius:7px;padding:10px 14px;font-size:13px;color:#c8531a;margin-bottom:14px;font-family:'Fira Code',monospace;"></div>
+          <!-- Breakdown tributário -->
+          <div id="venda-breakdown" style="display:none;margin-bottom:16px;"></div>
 
           <button type="submit" class="btn btn-primary">+ Registrar Venda</button>
         </form>
@@ -465,20 +467,104 @@
         <div class="card" style="margin-bottom:20px;">
           <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Novo Lote de Entrada</h3>
           <form id="form-lote">
+
+            <!-- Dados básicos -->
             <div class="form-grid">
               <div class="form-group">
                 <label>Produto *</label>
-                <input type="text" id="lote-nome" placeholder="Ex: Rastreador ST-900" required />
+                <input type="text" id="lote-nome" placeholder="Ex: Rastreador X16" required />
               </div>
               <div class="form-group">
                 <label>Data de Entrada *</label>
                 <input type="date" id="lote-data" required />
               </div>
               <div class="form-group">
-                <label>Custo Unitário (R$) *</label>
-                <input type="number" id="lote-custo" min="0" step="0.01" placeholder="0,00" required />
+                <label>Quantidade do Lote *</label>
+                <input type="number" id="lote-qtd" min="1" placeholder="Ex: 500" required />
               </div>
             </div>
+
+            <!-- Toggle importação -->
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:14px;cursor:pointer;">
+              <input type="checkbox" id="lote-eh-import" />
+              Este lote é de importação — calcular custo tributário real
+            </label>
+
+            <!-- Parâmetros de importação -->
+            <div id="lote-import-params" style="display:none;">
+              <div style="background:#fff8f5;border:1px solid #f0d0c0;border-radius:8px;padding:16px;margin-bottom:14px;">
+                <p style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;">
+                  Parâmetros de Importação — NCM 8526.91.00
+                </p>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>FOB (USD) *</label>
+                    <input type="number" id="lote-fob" step="0.01" placeholder="2500.00" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Frete Internacional (USD) *</label>
+                    <input type="number" id="lote-frete" step="0.01" placeholder="595.00" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Seguro Internacional (USD)</label>
+                    <input type="number" id="lote-seguro" step="0.01" placeholder="10.00" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Taxa de Câmbio (R$/USD) *</label>
+                    <div style="display:flex;gap:6px;">
+                      <input type="number" id="lote-cambio" step="0.0001" placeholder="5.00" style="flex:1;" oninput="window._previewCustoLote()" />
+                      <button type="button" class="btn btn-sm" style="background:#f0ede6;border:1px solid var(--border);white-space:nowrap;" onclick="window._buscarCambio()">
+                        BCB hoje
+                      </button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Alíq. II (%)</label>
+                    <input type="number" id="lote-ii" step="0.01" value="0" placeholder="0" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Alíq. IPI (%) ⚠️</label>
+                    <input type="number" id="lote-ipi" step="0.01" value="13" placeholder="13" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Alíq. PIS (%)</label>
+                    <input type="number" id="lote-pis" step="0.001" value="2.1" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Alíq. COFINS (%)</label>
+                    <input type="number" id="lote-cofins" step="0.001" value="9.65" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Alíq. ICMS-PA (%) — por dentro</label>
+                    <input type="number" id="lote-icms" step="0.01" value="19" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Custos Operacionais Lote (R$)</label>
+                    <input type="number" id="lote-custos-op" step="0.01" placeholder="2136.79" oninput="window._previewCustoLote()" />
+                  </div>
+                  <div class="form-group">
+                    <label>Alíq. Simples Nacional (%)</label>
+                    <input type="number" id="lote-simples" step="0.01" value="4" oninput="window._previewCustoLote()" />
+                  </div>
+                </div>
+
+                <!-- Preview custo do lote -->
+                <div id="lote-custo-preview" style="display:none;margin-top:14px;border-top:1px solid #f0d0c0;padding-top:14px;">
+                  <p style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Composição do Custo por Unidade</p>
+                  <div id="lote-custo-preview-content" style="font-size:13px;font-family:'Fira Code',monospace;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custo manual (quando não é importação) -->
+            <div id="lote-custo-manual-wrap">
+              <div class="form-group" style="max-width:220px;">
+                <label>Custo Unitário Manual (R$) *</label>
+                <input type="number" id="lote-custo" step="0.01" placeholder="0,00" />
+              </div>
+            </div>
+
             <button type="submit" class="btn btn-primary">+ Criar Lote</button>
           </form>
         </div>
@@ -567,7 +653,8 @@
   import { logout } from './js/auth.js'
   import { carregarClientes, adicionarCliente, fecharFichaCliente } from './js/clientes.js'
   window._fecharFichaCliente = fecharFichaCliente
-  import { carregarVendas, adicionarVenda, previewVenda } from './js/vendas.js'
+  import { carregarVendas, adicionarVenda, previewVenda, carregarLotesParaVenda, selecionarLote } from './js/vendas.js'
+  window._selecionarLote = selecionarLote
   import { carregarCustos, adicionarCusto } from './js/custos.js'
   import { initProjetor } from './js/projetor.js'
   import { carregarFluxo } from './js/fluxo.js'
@@ -577,8 +664,11 @@
     registrarAparelho, buscarAparelhoPorCodigo, confirmarSaida,
     iniciarScannerEntrada, pararScannerEntrada,
     iniciarScannerSaida, pararScannerSaida,
-    popularDatalistProdutos
+    previewCustoLote, buscarCambioHoje
   } from './js/estoque.js'
+
+  window._previewCustoLote = previewCustoLote
+  window._buscarCambio     = buscarCambioHoje
 
   window._iniciarScannerEntrada = iniciarScannerEntrada
   window._pararScannerEntrada   = pararScannerEntrada
@@ -615,7 +705,7 @@
       // Carrega dados ao mudar de aba
       if (target === 'dashboard') await carregarDashboard()
       if (target === 'clientes') await carregarClientes()
-      if (target === 'vendas') { await carregarClientes(); await carregarVendas(); await popularDatalistProdutos() }
+      if (target === 'vendas') { await carregarClientes(); await carregarVendas(); await carregarLotesParaVenda() }
       if (target === 'custos') await carregarCustos()
       if (target === 'fluxo') await carregarFluxo()
       if (target === 'estoque') await carregarEstoque()
@@ -637,14 +727,14 @@
   })
 
   // Form: Vendas + preview
-  const vendaInputs = ['venda-qtd', 'venda-custo', 'venda-preco', 'venda-parcelas']
+  const vendaInputs = ['venda-qtd', 'venda-preco', 'venda-parcelas']
   vendaInputs.forEach(id => document.getElementById(id)?.addEventListener('input', previewVenda))
 
   document.getElementById('form-venda').addEventListener('submit', async (e) => {
     e.preventDefault()
     const dados = {
       cliente_id: document.getElementById('venda-cliente').value,
-      produto: document.getElementById('venda-produto').value,
+      lote_id: document.getElementById('venda-lote').value,
       data: document.getElementById('venda-data').value,
       qtd: document.getElementById('venda-qtd').value,
       custo_unit: document.getElementById('venda-custo').value,
@@ -669,15 +759,47 @@
     if (ok) e.target.reset()
   })
 
+  // Toggle importação no form de lote
+  document.getElementById('lote-eh-import').addEventListener('change', (e) => {
+    const show = e.target.checked
+    document.getElementById('lote-import-params').style.display = show ? 'block' : 'none'
+    document.getElementById('lote-custo-manual-wrap').style.display = show ? 'none' : 'block'
+    document.getElementById('lote-custo').required = !show
+  })
+
   // Form: Lote
   document.getElementById('form-lote').addEventListener('submit', async (e) => {
     e.preventDefault()
-    const nome = document.getElementById('lote-nome').value
-    const data = document.getElementById('lote-data').value
-    const custo = document.getElementById('lote-custo').value
-    const lote = await criarLote(nome, data, custo)
+    const ehImport = document.getElementById('lote-eh-import').checked
+    const nome  = document.getElementById('lote-nome').value
+    const data  = document.getElementById('lote-data').value
+    const qtd   = document.getElementById('lote-qtd').value
+
+    let params = { ehImport: false, custo_unit: Number(document.getElementById('lote-custo').value || 0) }
+
+    if (ehImport) {
+      params = {
+        ehImport: true,
+        custoFOB_USD:            Number(document.getElementById('lote-fob').value || 0),
+        freteInternacional_USD:  Number(document.getElementById('lote-frete').value || 0),
+        seguroInternacional_USD: Number(document.getElementById('lote-seguro').value || 0),
+        taxaCambio:              Number(document.getElementById('lote-cambio').value || 0),
+        aliqII:    Number(document.getElementById('lote-ii').value || 0) / 100,
+        aliqIPI:   Number(document.getElementById('lote-ipi').value || 0) / 100,
+        aliqPIS:   Number(document.getElementById('lote-pis').value || 0) / 100,
+        aliqCOFINS:Number(document.getElementById('lote-cofins').value || 0) / 100,
+        aliqICMS:  Number(document.getElementById('lote-icms').value || 0) / 100,
+        custosOpLote: Number(document.getElementById('lote-custos-op').value || 0),
+        aliqSimples:  Number(document.getElementById('lote-simples').value || 0) / 100,
+      }
+    }
+
+    const lote = await criarLote(nome, data, Number(qtd), params)
     if (lote) {
       e.target.reset()
+      document.getElementById('lote-import-params').style.display = 'none'
+      document.getElementById('lote-custo-manual-wrap').style.display = 'block'
+      document.getElementById('lote-custo-preview').style.display = 'none'
       ativarLote(lote.id, lote.nome_produto)
     }
   })
