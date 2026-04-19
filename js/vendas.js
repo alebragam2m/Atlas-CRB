@@ -1,50 +1,83 @@
 import { supabase } from '../supabase.js'
-import { calcularImpostos } from './tributario.js'
+import { calcularImpostos, calcularCustoUnitario } from './tributario.js'
 
-// Lote atualmente selecionado no form de venda
+// Lote atualmente selecionado + cache de todos os lotes
 let loteAtual = null
+let lotesCache = []
+
+// ── CUSTO REAL DO LOTE ────────────────────────────────────────────────────────
+// Sempre recalcula dos parâmetros quando disponíveis — não confia no valor salvo no DB
+
+function custoRealDoLote(lote) {
+  if (!lote) return 0
+  // Se tem parâmetros de importação, recalcula ao vivo
+  if (lote.tem_import && lote.custo_fob_usd && lote.qtd_lote) {
+    return calcularCustoUnitario({
+      custoFOB_USD:            Number(lote.custo_fob_usd),
+      freteInternacional_USD:  Number(lote.frete_intl_usd || 0),
+      seguroInternacional_USD: Number(lote.seguro_intl_usd || 0),
+      taxaCambio:              Number(lote.taxa_cambio || 1),
+      aliqII:                  Number(lote.aliq_ii || 0),
+      aliqIPI:                 Number(lote.aliq_ipi || 0),
+      aliqPIS:                 Number(lote.aliq_pis || 0),
+      aliqCOFINS:              Number(lote.aliq_cofins || 0),
+      aliqICMS:                Number(lote.aliq_icms || 0),
+      custosOpLote:            Number(lote.custos_op_lote || 0),
+      qtdLote:                 Number(lote.qtd_lote),
+    })
+  }
+  // Fallback: valor manual salvo
+  return Number(lote.custo_unitario_real) || Number(lote.custo_unit) || 0
+}
 
 // ── CARREGAR LOTES PARA O SELECT ─────────────────────────────────────────────
 
 export async function carregarLotesParaVenda() {
   const { data: lotes } = await supabase
     .from('lotes')
-    .select('id, nome_produto, data_entrada, custo_unit, custo_unitario_real, tem_import, aparelhos(id, status)')
+    .select('*, aparelhos(id, status)')
     .order('data_entrada', { ascending: false })
 
   const sel = document.getElementById('venda-lote')
   if (!sel || !lotes) return
 
+  lotesCache = lotes
+
   sel.innerHTML = '<option value="">Selecione o lote...</option>' +
     lotes.map(l => {
-      const disp = (l.aparelhos || []).filter(a => a.status === 'disponivel').length
-      const custo = l.custo_unitario_real || l.custo_unit || 0
+      const disp  = (l.aparelhos || []).filter(a => a.status === 'disponivel').length
+      const custo = custoRealDoLote(l)
       const data  = formatarData(l.data_entrada)
-      return `<option value="${l.id}">${escapeHtml(l.nome_produto)} — ${data} — Custo R$ ${Number(custo).toFixed(2)} (${disp} disp.)</option>`
+      return `<option value="${l.id}">${escapeHtml(l.nome_produto)} — ${data} — R$ ${custo.toFixed(2)}/un (${disp} disp.)</option>`
     }).join('')
 }
 
 // ── SELECIONAR LOTE ───────────────────────────────────────────────────────────
 
 export async function selecionarLote(loteId) {
+  const campoEl   = document.getElementById('venda-custo')
+  const breakEl   = document.getElementById('venda-breakdown')
+
   if (!loteId) {
     loteAtual = null
-    document.getElementById('venda-custo').value = ''
-    document.getElementById('venda-breakdown').style.display = 'none'
+    if (campoEl) campoEl.value = ''
+    if (breakEl) breakEl.style.display = 'none'
     return
   }
 
-  const { data: lote } = await supabase
-    .from('lotes')
-    .select('*')
-    .eq('id', loteId)
-    .single()
+  // Usa cache primeiro; se não tiver, busca no banco
+  loteAtual = lotesCache.find(l => l.id === loteId) || null
 
-  if (!lote) return
-  loteAtual = lote
+  if (!loteAtual) {
+    const { data } = await supabase.from('lotes').select('*').eq('id', loteId).single()
+    loteAtual = data
+  }
 
-  const custo = lote.custo_unitario_real || lote.custo_unit || 0
-  document.getElementById('venda-custo').value = Number(custo).toFixed(2)
+  if (!loteAtual) return
+
+  // Sempre recalcula ao vivo — nunca confia no 0 salvo no DB
+  const custo = custoRealDoLote(loteAtual)
+  if (campoEl) campoEl.value = custo.toFixed(2)
 
   previewVenda()
 }
@@ -140,7 +173,7 @@ export function previewVenda() {
   }
 
   // Lote simples → preview básico
-  const custo = loteAtual?.custo_unitario_real || loteAtual?.custo_unit || 0
+  const custo = custoRealDoLote(loteAtual)
   const total  = preco * qtd
   const lucro  = (preco - custo) * qtd
   const margem = preco > 0 ? ((preco - custo) / preco * 100).toFixed(1) : 0
@@ -199,7 +232,8 @@ function renderizarVendas(lista) {
 // ── ADICIONAR VENDA ───────────────────────────────────────────────────────────
 
 export async function adicionarVenda(dados) {
-  const custo_unit  = Number(document.getElementById('venda-custo')?.value || 0)
+  // Prioriza recálculo ao vivo; DOM é fallback para lotes sem parâmetros de importação
+  const custo_unit  = loteAtual ? custoRealDoLote(loteAtual) : Number(document.getElementById('venda-custo')?.value || 0)
   const total       = dados.qtd * dados.preco_unit
   const lucro       = (dados.preco_unit - custo_unit) * dados.qtd
   const valor_parcela = total / dados.num_parcelas
