@@ -30,17 +30,20 @@ export async function calcularProjecao() {
 
   const totalCustos = descontarCustos ? await getTotalCustos() : 0
 
-  const investimento = qtd * custo
-  const receitaBruta = qtd * preco
-  const lucroBruto = receitaBruta - investimento
-  const margem = receitaBruta > 0 ? ((lucroBruto / receitaBruta) * 100).toFixed(1) : 0
-  const parcelaMes = receitaBruta / parcelas
-  const receitaLiquida = parcelaMes - totalCustos
+  const investimento    = qtd * custo
+  const receitaBruta    = qtd * preco
+  const lucroBruto      = receitaBruta - investimento
+  const margem          = receitaBruta > 0 ? ((lucroBruto / receitaBruta) * 100).toFixed(1) : 0
+  const parcelaMes      = receitaBruta / parcelas
+  const custoPropParc   = investimento / parcelas          // custo do produto distribuído por parcela
+  const lucroParcela    = parcelaMes - custoPropParc - totalCustos
+  const margemParcela   = parcelaMes > 0 ? ((lucroParcela / parcelaMes) * 100).toFixed(1) : 0
+  const receitaLiquida  = parcelaMes - totalCustos         // sem descontar custo produto (já pago)
 
   // Frase resumo
   const frase = document.getElementById('proj-frase')
   if (frase) {
-    frase.textContent = `${qtd} aparelhos a ${fm(preco)} em ${parcelas}x → você recebe ${fm(parcelaMes)}/mês bruto e ${fm(receitaLiquida)}/mês líquido`
+    frase.textContent = `${qtd} aparelhos a ${fm(preco)} em ${parcelas}x → parcela ${fm(parcelaMes)} · lucro ${fm(lucroParcela)}/mês · margem ${margemParcela}%`
     frase.parentElement.classList.add('show')
   }
 
@@ -51,15 +54,20 @@ export async function calcularProjecao() {
   document.getElementById('proj-kpi-margem').textContent = margem + '%'
   setKpi('proj-kpi-parcela', parcelaMes)
   setKpi('proj-kpi-liquida', receitaLiquida)
+  setKpi('proj-kpi-lucro-parc', lucroParcela)
+  document.getElementById('proj-kpi-margem-parc').textContent = margemParcela + '%'
 
   // Meses
   const meses = gerarMeses(mesInicio, parcelas)
   const tabelaData = meses.map((m, i) => ({
-    mes: formatarMesExibicao(m),
-    bruta: parcelaMes,
-    custos: totalCustos,
-    liquida: receitaLiquida,
-    acumulado: receitaLiquida * (i + 1) - investimento
+    num:       i + 1,
+    mes:       formatarMesExibicao(m),
+    bruta:     parcelaMes,
+    custoProp: custoPropParc,
+    custos:    totalCustos,
+    lucro:     lucroParcela,
+    margem:    margemParcela,
+    acumulado: lucroParcela * (i + 1)
   }))
 
   // Tabela
@@ -75,21 +83,26 @@ function renderizarTabelaProjecao(dados) {
   const tbody = document.getElementById('proj-tbody')
   if (!tbody) return
 
-  tbody.innerHTML = dados.map(d => `
+  tbody.innerHTML = dados.map(d => {
+    const margemCor = Number(d.margem) >= 35 ? 'money-green' : Number(d.margem) >= 20 ? '' : 'money-red'
+    return `
     <tr>
+      <td style="font-family:'Fira Code',monospace;color:var(--text-muted);">${d.num}</td>
       <td>${d.mes}</td>
       <td class="money">${fm(d.bruta)}</td>
-      <td class="money money-red">${fm(d.custos)}</td>
-      <td class="money money-green">${fm(d.liquida)}</td>
+      <td class="money money-red">- ${fm(d.custoProp)}</td>
+      <td class="money money-red">- ${fm(d.custos)}</td>
+      <td class="money money-green">${fm(d.lucro)}</td>
+      <td class="money ${margemCor}" style="font-weight:700;">${d.margem}%</td>
       <td class="money ${d.acumulado >= 0 ? 'money-green' : 'money-red'}">${fm(d.acumulado)}</td>
-    </tr>
-  `).join('')
+    </tr>`
+  }).join('')
 }
 
 function renderizarGraficos(dados) {
   const meses = dados.map(d => d.mes)
   const brutas = dados.map(d => d.bruta)
-  const liquidas = dados.map(d => d.liquida)
+  const lucros = dados.map(d => d.lucro)
   const acumulados = dados.map(d => d.acumulado)
 
   // Gráfico de barras
@@ -101,8 +114,8 @@ function renderizarGraficos(dados) {
       data: {
         labels: meses,
         datasets: [
-          { label: 'Receita Bruta', data: brutas, backgroundColor: '#c8531a88', borderColor: '#c8531a', borderWidth: 1 },
-          { label: 'Receita Líquida', data: liquidas, backgroundColor: '#00b89488', borderColor: '#00b894', borderWidth: 1 }
+          { label: 'Valor Parcela', data: brutas, backgroundColor: '#c8531a88', borderColor: '#c8531a', borderWidth: 1 },
+          { label: 'Lucro da Parcela', data: lucros, backgroundColor: '#00b89488', borderColor: '#00b894', borderWidth: 1 }
         ]
       },
       options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
