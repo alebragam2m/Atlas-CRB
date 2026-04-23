@@ -212,7 +212,16 @@ function renderizarVendas(lista) {
     return
   }
 
-  tbody.innerHTML = lista.map(v => `
+  tbody.innerHTML = lista.map(v => {
+    const nfeStatus = v.nfe_status
+    const nfeBadge = nfeStatus ? nfeBadgeHtml(nfeStatus, v.nfe_pdf_url) : ''
+    const nfeBtn = nfeStatus === 'autorizado'
+      ? `<button class="btn btn-sm" id="nfe-btn-${v.id}" onclick="window._emitirNFe('${v.id}')" style="background:#d4edda;color:#155724;border:none;">📄 DANFE</button>`
+      : nfeStatus === 'processando'
+      ? `<button class="btn btn-sm" id="nfe-btn-${v.id}" onclick="window._consultarNFe('${v.id}','${v.nfe_ref}')">🔄 Verificar</button>`
+      : `<button class="btn btn-sm btn-primary" id="nfe-btn-${v.id}" onclick="window._emitirNFe('${v.id}')">Emitir NF-e</button>`
+
+    return `
     <tr>
       <td>${formatarData(v.data)}</td>
       <td>${escapeHtml(v.clientes?.nome || '—')}</td>
@@ -223,10 +232,14 @@ function renderizarVendas(lista) {
       <td class="money money-green">${formatarMoeda(v.lucro)}</td>
       <td>${v.num_parcelas}x de ${formatarMoeda(v.valor_parcela)}</td>
       <td>
+        <div id="nfe-status-${v.id}" style="margin-bottom:4px;">${nfeBadge}</div>
+        ${nfeBtn}
+      </td>
+      <td>
         <button class="btn btn-danger" onclick="window._removerVenda('${v.id}')">Excluir</button>
       </td>
-    </tr>
-  `).join('')
+    </tr>`
+  }).join('')
 }
 
 // ── ADICIONAR VENDA ───────────────────────────────────────────────────────────
@@ -333,6 +346,20 @@ function mostrarAlerta(id, msg, tipo) {
   el.textContent = msg
   el.className = `alert alert-${tipo} show`
   setTimeout(() => el.classList.remove('show'), 4000)
+}
+
+function nfeBadgeHtml(status, pdfUrl) {
+  const MAP = {
+    autorizado:  ['#d4edda', '#155724', '✓ Autorizada'],
+    processando: ['#fff3cd', '#856404', '⏳ Processando'],
+    denegado:    ['#f8d7da', '#721c24', '✗ Denegada'],
+    cancelado:   ['#f8d7da', '#721c24', '✗ Cancelada'],
+    erro:        ['#f8d7da', '#721c24', '✗ Erro']
+  }
+  const [bg, color, label] = MAP[status] || MAP.erro
+  const link = (pdfUrl && status === 'autorizado')
+    ? ` <a href="${pdfUrl}" target="_blank" style="color:${color};font-size:10px;">PDF</a>` : ''
+  return `<span style="background:${bg};color:${color};padding:2px 7px;border-radius:20px;font-size:11px;font-weight:600;">${label}</span>${link}`
 }
 
 window._removerVenda = removerVenda

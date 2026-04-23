@@ -42,12 +42,16 @@ export function renderizarClientes(lista) {
   `).join('')
 }
 
-export async function adicionarCliente(nome, nomeContato, local, contato) {
+export async function adicionarCliente({ nome, nome_contato, cpf_cnpj, contato, local, cep, municipio, uf }) {
   const { error } = await supabase.from('clientes').insert({
-    nome: nome.trim(),
-    nome_contato: nomeContato.trim(),
-    local: local.trim(),
-    contato: contato.trim()
+    nome:         nome.trim(),
+    nome_contato: (nome_contato || '').trim(),
+    cpf_cnpj:     (cpf_cnpj || '').trim(),
+    contato:      (contato || '').trim(),
+    local:        (local || '').trim(),
+    cep:          (cep || '').trim(),
+    municipio:    (municipio || '').trim(),
+    uf:           (uf || 'PA').trim()
   })
 
   if (error) {

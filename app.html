@@ -130,12 +130,39 @@
               <input type="text" id="cli-nome-contato" placeholder="Ex: João Silva" />
             </div>
             <div class="form-group">
-              <label>Cidade / Estado</label>
-              <input type="text" id="cli-local" placeholder="Ex: São Paulo - SP" />
+              <label>CPF / CNPJ <span style="color:var(--accent);font-size:11px;">(NF-e)</span></label>
+              <input type="text" id="cli-cpf-cnpj" placeholder="000.000.000-00 ou 00.000.000/0001-00" />
             </div>
             <div class="form-group">
               <label>Telefone / E-mail</label>
               <input type="text" id="cli-contato" placeholder="Telefone ou e-mail" />
+            </div>
+            <div class="form-group">
+              <label>Endereço (Rua, Nº, Bairro)</label>
+              <input type="text" id="cli-local" placeholder="Ex: R. das Flores, 100, Centro" />
+            </div>
+            <div class="form-group">
+              <label>CEP</label>
+              <input type="text" id="cli-cep" placeholder="00000-000" />
+            </div>
+            <div class="form-group">
+              <label>Município</label>
+              <input type="text" id="cli-municipio" placeholder="Ex: Belém" />
+            </div>
+            <div class="form-group">
+              <label>UF</label>
+              <select id="cli-uf">
+                <option value="PA" selected>PA</option>
+                <option value="AC">AC</option><option value="AL">AL</option><option value="AM">AM</option>
+                <option value="AP">AP</option><option value="BA">BA</option><option value="CE">CE</option>
+                <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+                <option value="MA">MA</option><option value="MG">MG</option><option value="MS">MS</option>
+                <option value="MT">MT</option><option value="PE">PE</option><option value="PI">PI</option>
+                <option value="PR">PR</option><option value="RJ">RJ</option><option value="RN">RN</option>
+                <option value="RO">RO</option><option value="RR">RR</option><option value="RS">RS</option>
+                <option value="SC">SC</option><option value="SE">SE</option><option value="SP">SP</option>
+                <option value="TO">TO</option>
+              </select>
             </div>
           </div>
           <button type="submit" class="btn btn-primary">+ Adicionar Cliente</button>
@@ -246,6 +273,7 @@
                 <th>Total</th>
                 <th>Lucro</th>
                 <th>Parcelas</th>
+                <th>NF-e</th>
                 <th></th>
               </tr>
             </thead>
@@ -670,6 +698,7 @@
   import { initProjetor } from './js/projetor.js'
   import { carregarFluxo } from './js/fluxo.js'
   import { carregarDashboard } from './js/dashboard.js'
+  import { emitirNFe, consultarNFe } from './js/nfe.js'
   import {
     carregarEstoque, criarLote, ativarLote,
     registrarAparelho, buscarAparelhoPorCodigo, confirmarSaida,
@@ -729,11 +758,16 @@
   // Form: Clientes
   document.getElementById('form-cliente').addEventListener('submit', async (e) => {
     e.preventDefault()
-    const nome = document.getElementById('cli-nome').value
-    const nomeContato = document.getElementById('cli-nome-contato').value
-    const local = document.getElementById('cli-local').value
-    const contato = document.getElementById('cli-contato').value
-    const ok = await adicionarCliente(nome, nomeContato, local, contato)
+    const ok = await adicionarCliente({
+      nome:         document.getElementById('cli-nome').value,
+      nome_contato: document.getElementById('cli-nome-contato').value,
+      cpf_cnpj:     document.getElementById('cli-cpf-cnpj').value,
+      contato:      document.getElementById('cli-contato').value,
+      local:        document.getElementById('cli-local').value,
+      cep:          document.getElementById('cli-cep').value,
+      municipio:    document.getElementById('cli-municipio').value,
+      uf:           document.getElementById('cli-uf').value
+    })
     if (ok) e.target.reset()
   })
 
