@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Atlas CRB · Gestão de Vendas</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
@@ -14,670 +14,408 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <h1>📡 Atlas CRB</h1>
-      <span>Gestão de Vendas</span>
+      <div class="sidebar-logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      </div>
+      <div class="sidebar-logo-text">
+        <strong>Atlas CRB</strong>
+        <span>Gestão de Vendas</span>
+      </div>
     </div>
+
     <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
       <div class="nav-item active" data-section="dashboard">
-        <span class="icon">📊</span> Dashboard
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
       </div>
       <div class="nav-item" data-section="clientes">
-        <span class="icon">👥</span> Clientes
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Clientes
       </div>
       <div class="nav-item" data-section="vendas">
-        <span class="icon">💼</span> Vendas
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Vendas
       </div>
+      <div class="nav-section-label">Financeiro</div>
       <div class="nav-item" data-section="custos">
-        <span class="icon">📋</span> Custos Fixos
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Custos Fixos
       </div>
       <div class="nav-item" data-section="projetor">
-        <span class="icon">🔮</span> Projetor de Lucro
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Projetor de Lucro
       </div>
       <div class="nav-item" data-section="fluxo">
-        <span class="icon">💰</span> Fluxo de Caixa
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Fluxo de Caixa
       </div>
+      <div class="nav-section-label">Operações</div>
       <div class="nav-item" data-section="estoque">
-        <span class="icon">📦</span> Estoque
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        Estoque
       </div>
     </nav>
+
     <div class="sidebar-footer">
-      <button class="btn-logout" id="btnLogout">
-        <span>↩</span> <span>Sair</span>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">AC</div>
+        <div class="sidebar-user-info">
+          <strong>Atlas CRB</strong>
+          <span>Administrador</span>
+        </div>
+        <button class="btn-logout" id="btnLogout" style="display:none"></button>
+      </div>
+      <button id="btnLogoutVisible" style="background:transparent;border:none;cursor:pointer;color:oklch(0.5 0.02 268);font-size:12px;font-family:inherit;padding:6px 10px;width:100%;text-align:left;margin-top:4px;">
+        ↩ Sair da conta
       </button>
     </div>
   </aside>
 
   <!-- MAIN -->
-  <main class="main-content">
+  <div class="main-content">
 
-    <!-- DASHBOARD -->
-    <section class="section active" id="section-dashboard">
-      <div class="page-header">
-        <h2>Dashboard</h2>
-        <p>Visão geral do negócio</p>
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <div class="top-header-title">
+        <h1 id="hdr-title">Dashboard</h1>
+        <p id="hdr-sub">Visão geral do negócio</p>
       </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-card accent">
-          <div class="kpi-label">Receita Total Projetada</div>
-          <div class="kpi-value" id="dash-kpi-receita">—</div>
+      <div class="top-header-actions">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Buscar..."/>
         </div>
-        <div class="kpi-card success">
-          <div class="kpi-label">Lucro Total Bruto</div>
-          <div class="kpi-value" id="dash-kpi-lucro">—</div>
+        <button class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content-wrap">
+
+      <!-- DASHBOARD -->
+      <section class="section active" id="section-dashboard">
+        <div class="page-header">
+          <div><h2>Dashboard</h2><p>Visão geral do negócio</p></div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Aparelhos Vendidos</div>
-          <div class="kpi-value" id="dash-kpi-aparelhos">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Custo Fixo/Mês</div>
-          <div class="kpi-value" id="dash-kpi-custo">—</div>
-        </div>
-      </div>
-
-      <div class="charts-grid">
-        <div class="chart-card">
-          <h3>Receita por Mês</h3>
-          <canvas id="dash-chart-barras"></canvas>
-        </div>
-        <div class="chart-card">
-          <h3>Receita por Cliente</h3>
-          <canvas id="dash-chart-rosca"></canvas>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:16px;">
-          Resumo Mensal
-        </h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Mês</th>
-                <th>Receita Bruta</th>
-                <th>Custos Fixos</th>
-                <th>Receita Líquida</th>
-              </tr>
-            </thead>
-            <tbody id="dash-tbody">
-              <tr><td colspan="4" class="empty-state">Carregando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- CLIENTES -->
-    <section class="section" id="section-clientes">
-      <div class="page-header">
-        <h2>Clientes</h2>
-        <p>Gerencie sua carteira de clientes</p>
-      </div>
-
-      <div class="card" style="margin-bottom:20px;">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Adicionar Cliente</h3>
-        <div id="clientes-alert" class="alert"></div>
-        <form id="form-cliente">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Nome da Empresa *</label>
-              <input type="text" id="cli-nome" placeholder="Nome do cliente / empresa" required />
-            </div>
-            <div class="form-group">
-              <label>Nome do Contato</label>
-              <input type="text" id="cli-nome-contato" placeholder="Ex: João Silva" />
-            </div>
-            <div class="form-group">
-              <label>CPF / CNPJ <span style="color:var(--accent);font-size:11px;">(NF-e)</span></label>
-              <input type="text" id="cli-cpf-cnpj" placeholder="000.000.000-00 ou 00.000.000/0001-00" />
-            </div>
-            <div class="form-group">
-              <label>Telefone / E-mail</label>
-              <input type="text" id="cli-contato" placeholder="Telefone ou e-mail" />
-            </div>
-            <div class="form-group">
-              <label>Endereço (Rua, Nº, Bairro)</label>
-              <input type="text" id="cli-local" placeholder="Ex: R. das Flores, 100, Centro" />
-            </div>
-            <div class="form-group">
-              <label>CEP</label>
-              <input type="text" id="cli-cep" placeholder="00000-000" />
-            </div>
-            <div class="form-group">
-              <label>Município</label>
-              <input type="text" id="cli-municipio" placeholder="Ex: Belém" />
-            </div>
-            <div class="form-group">
-              <label>UF</label>
-              <select id="cli-uf">
-                <option value="PA" selected>PA</option>
-                <option value="AC">AC</option><option value="AL">AL</option><option value="AM">AM</option>
-                <option value="AP">AP</option><option value="BA">BA</option><option value="CE">CE</option>
-                <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
-                <option value="MA">MA</option><option value="MG">MG</option><option value="MS">MS</option>
-                <option value="MT">MT</option><option value="PE">PE</option><option value="PI">PI</option>
-                <option value="PR">PR</option><option value="RJ">RJ</option><option value="RN">RN</option>
-                <option value="RO">RO</option><option value="RR">RR</option><option value="RS">RS</option>
-                <option value="SC">SC</option><option value="SE">SE</option><option value="SP">SP</option>
-                <option value="TO">TO</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary">+ Adicionar Cliente</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Clientes Cadastrados</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Responsável</th>
-                <th>Localidade</th>
-                <th>Contato</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="clientes-tbody">
-              <tr><td colspan="5" class="empty-state">Carregando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- VENDAS -->
-    <section class="section" id="section-vendas">
-      <div class="page-header">
-        <h2>Vendas</h2>
-        <p>Registre vendas e parcelas</p>
-      </div>
-
-      <div class="card" style="margin-bottom:20px;">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Nova Venda</h3>
-        <div id="vendas-alert" class="alert"></div>
-        <form id="form-venda">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Cliente *</label>
-              <select id="venda-cliente" class="select-cliente" required>
-                <option value="">Selecione um cliente...</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Lote / Produto *</label>
-              <select id="venda-lote" required onchange="window._selecionarLote(this.value)">
-                <option value="">Selecione o lote...</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Data da Venda *</label>
-              <input type="date" id="venda-data" required />
-            </div>
-            <div class="form-group">
-              <label>Quantidade *</label>
-              <input type="number" id="venda-qtd" min="1" placeholder="Ex: 10" required />
-            </div>
-            <div class="form-group">
-              <label>Custo Unit. Real (R$)</label>
-              <input type="number" id="venda-custo" min="0" step="0.01" placeholder="0,00" style="background:#f5f2eb;" readonly />
-            </div>
-            <div class="form-group">
-              <label>Preço de Venda Unit. (R$) *</label>
-              <input type="number" id="venda-preco" min="0.01" step="0.01" placeholder="0,00" required />
-            </div>
-            <div class="form-group">
-              <label>Nº de Parcelas *</label>
-              <select id="venda-parcelas" required>
-                <option value="1">1x (à vista)</option>
-                <option value="2">2x</option>
-                <option value="3">3x</option>
-                <option value="4">4x</option>
-                <option value="5">5x</option>
-                <option value="6">6x</option>
-                <option value="12">12x</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Vencimento 1ª Parcela *</label>
-              <input type="date" id="venda-venc" required />
-            </div>
-            <div class="form-group">
-              <label>Observação</label>
-              <input type="text" id="venda-obs" placeholder="Opcional" />
-            </div>
-          </div>
-
-          <!-- Breakdown tributário -->
-          <div id="venda-breakdown" style="display:none;margin-bottom:16px;"></div>
-
-          <button type="submit" class="btn btn-primary">+ Registrar Venda</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Vendas Registradas</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Cliente</th>
-                <th>Produto</th>
-                <th>Qtd</th>
-                <th>Preço Unit.</th>
-                <th>Total</th>
-                <th>Lucro</th>
-                <th>Parcelas</th>
-                <th>NF-e</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="vendas-tbody">
-              <tr><td colspan="8" class="empty-state">Carregando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- CUSTOS FIXOS -->
-    <section class="section" id="section-custos">
-      <div class="page-header">
-        <h2>Custos Fixos</h2>
-        <p>Despesas mensais recorrentes</p>
-      </div>
-
-      <div class="card" style="margin-bottom:20px;">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Adicionar Custo</h3>
-        <div id="custos-alert" class="alert"></div>
-        <form id="form-custo">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Descrição *</label>
-              <input type="text" id="custo-nome" placeholder="Ex: Aluguel, Internet..." required />
-            </div>
-            <div class="form-group">
-              <label>Valor Mensal (R$) *</label>
-              <input type="number" id="custo-valor" min="0.01" step="0.01" placeholder="0,00" required />
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary">+ Adicionar</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div id="custos-lista">
-          <p class="empty-state">Carregando...</p>
-        </div>
-        <hr class="section-divider" />
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-weight:700;font-size:14px;">Total Mensal</span>
-          <span class="money money-red" id="custos-total" style="font-size:20px;font-family:'Fira Code',monospace;font-weight:700;">—</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROJETOR DE LUCRO -->
-    <section class="section" id="section-projetor">
-      <div class="page-header">
-        <h2>Projetor de Lucro</h2>
-        <p>Simule cenários sem salvar no banco</p>
-      </div>
-
-      <div class="card" style="margin-bottom:20px;">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Parâmetros</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Quantidade de Aparelhos</label>
-            <input type="number" id="proj-qtd" min="1" placeholder="Ex: 20" />
-          </div>
-          <div class="form-group">
-            <label>Custo por Aparelho (R$)</label>
-            <input type="number" id="proj-custo" min="0" step="0.01" placeholder="0,00" />
-          </div>
-          <div class="form-group">
-            <label>Preço de Venda (R$)</label>
-            <input type="number" id="proj-preco" min="0.01" step="0.01" placeholder="0,00" />
-          </div>
-          <div class="form-group">
-            <label>Número de Parcelas</label>
-            <select id="proj-parcelas">
-              <option value="1">1x</option>
-              <option value="2">2x</option>
-              <option value="3">3x</option>
-              <option value="4">4x</option>
-              <option value="5">5x</option>
-              <option value="6">6x</option>
-              <option value="12">12x</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Mês de Início (1ª Parcela)</label>
-            <input type="month" id="proj-inicio" />
-          </div>
-          <div class="form-group" style="justify-content:flex-end;padding-bottom:4px;">
-            <label>
-              <input type="checkbox" id="proj-desc-custos" /> Descontar custos fixos mensais
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="projetor-resultado" id="proj-resultado-frase">
-        <span id="proj-frase"></span>
-      </div>
-
-      <div id="proj-resultados" style="display:none;">
-        <div class="kpi-grid" style="margin-bottom:20px;">
-          <div class="kpi-card">
-            <div class="kpi-label">Investimento Total</div>
-            <div class="kpi-value" id="proj-kpi-invest">—</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Receita Bruta Total</div>
-            <div class="kpi-value" id="proj-kpi-bruta">—</div>
-          </div>
-          <div class="kpi-card success">
-            <div class="kpi-label">Lucro Bruto</div>
-            <div class="kpi-value" id="proj-kpi-lucro">—</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Margem</div>
-            <div class="kpi-value" id="proj-kpi-margem">—</div>
-          </div>
+        <div class="kpi-grid">
           <div class="kpi-card accent">
-            <div class="kpi-label">Parcela/Mês (bruta)</div>
-            <div class="kpi-value" id="proj-kpi-parcela">—</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Receita Líquida/Mês</div>
-            <div class="kpi-value" id="proj-kpi-liquida">—</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="kpi-label">Receita Total Projetada</div>
+            <div class="kpi-value" id="dash-kpi-receita">—</div>
           </div>
           <div class="kpi-card success">
-            <div class="kpi-label">Lucro por Parcela</div>
-            <div class="kpi-value" id="proj-kpi-lucro-parc">—</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+            <div class="kpi-label">Lucro Total Bruto</div>
+            <div class="kpi-value" id="dash-kpi-lucro">—</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-label">Margem Líquida/Parcela</div>
-            <div class="kpi-value" id="proj-kpi-margem-parc">—</div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+            <div class="kpi-label">Aparelhos Vendidos</div>
+            <div class="kpi-value" id="dash-kpi-aparelhos">—</div>
+          </div>
+          <div class="kpi-card warning">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="kpi-label">Custo Fixo / Mês</div>
+            <div class="kpi-value" id="dash-kpi-custo">—</div>
           </div>
         </div>
-
-        <div class="charts-grid" style="margin-bottom:20px;">
-          <div class="chart-card">
-            <h3>Receita Bruta vs Líquida por Mês</h3>
-            <canvas id="proj-chart-barras"></canvas>
-          </div>
-          <div class="chart-card">
-            <h3>Caixa Acumulado</h3>
-            <canvas id="proj-chart-linha"></canvas>
-          </div>
+        <div class="charts-grid">
+          <div class="chart-card"><h3>Receita por Mês</h3><div class="chart-wrap"><canvas id="dash-chart-barras"></canvas></div></div>
+          <div class="chart-card"><h3>Receita por Cliente</h3><div class="chart-wrap"><canvas id="dash-chart-rosca"></canvas></div></div>
         </div>
-
         <div class="card">
-          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:16px;">
-            Projeção Mês a Mês
-          </h3>
+          <div class="card-title">Resumo Mensal</div>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Mês</th>
-                  <th>Valor Parcela</th>
-                  <th>Custo Produto</th>
-                  <th>Custos Fixos</th>
-                  <th>Lucro da Parcela</th>
-                  <th>Margem %</th>
-                  <th>Acumulado</th>
-                </tr>
-              </thead>
-              <tbody id="proj-tbody"></tbody>
+              <thead><tr><th>Mês</th><th>Receita Bruta</th><th>Custos Fixos</th><th>Receita Líquida</th></tr></thead>
+              <tbody id="dash-tbody"><tr><td colspan="4" class="empty-state">Carregando...</td></tr></tbody>
             </table>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- FLUXO DE CAIXA -->
-    <section class="section" id="section-fluxo">
-      <div class="page-header">
-        <h2>Fluxo de Caixa</h2>
-        <p>Baseado nas parcelas reais cadastradas</p>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-card accent">
-          <div class="kpi-label">Receita Total Projetada</div>
-          <div class="kpi-value" id="fluxo-kpi-total">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Melhor Mês</div>
-          <div class="kpi-value" style="font-size:16px;" id="fluxo-kpi-melhor">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Custos Fixos/Mês</div>
-          <div class="kpi-value" id="fluxo-kpi-custos">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Meses com Receita</div>
-          <div class="kpi-value" id="fluxo-kpi-meses">—</div>
-        </div>
-      </div>
-
-      <div class="chart-card" style="margin:20px 0;">
-        <h3>Receita Mensal</h3>
-        <canvas id="fluxo-chart"></canvas>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:16px;">
-          Timeline por Cliente
-        </h3>
-        <div id="fluxo-timeline">
-          <p class="empty-state">Carregando...</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ESTOQUE -->
-    <section class="section" id="section-estoque">
-      <div class="page-header">
-        <h2>Estoque</h2>
-        <p>Controle de lotes e aparelhos individuais</p>
-      </div>
-
-      <!-- TABS -->
-      <div class="estoque-tabs">
-        <button class="etab active" data-tab="etab-lotes">Lotes / Entradas</button>
-        <button class="etab" data-tab="etab-saidas">Dar Baixa (Saída)</button>
-      </div>
-
-      <!-- TAB: LOTES / ENTRADAS -->
-      <div id="etab-lotes" class="etab-content active">
-        <div id="estoque-alert" class="alert"></div>
-
-        <!-- Criar novo lote -->
+      <!-- CLIENTES -->
+      <section class="section" id="section-clientes">
+        <div class="page-header"><div><h2>Clientes</h2><p>Gerencie sua carteira de clientes</p></div></div>
         <div class="card" style="margin-bottom:20px;">
-          <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Novo Lote de Entrada</h3>
-          <form id="form-lote">
-
-            <!-- Dados básicos -->
+          <div class="card-title">Adicionar Cliente</div>
+          <div id="clientes-alert" class="alert"></div>
+          <form id="form-cliente">
             <div class="form-grid">
-              <div class="form-group">
-                <label>Produto *</label>
-                <input type="text" id="lote-nome" placeholder="Ex: Rastreador X16" required />
-              </div>
-              <div class="form-group">
-                <label>Data de Entrada *</label>
-                <input type="date" id="lote-data" required />
-              </div>
-              <div class="form-group">
-                <label>Quantidade do Lote *</label>
-                <input type="number" id="lote-qtd" min="1" placeholder="Ex: 500" required />
-              </div>
-            </div>
-
-            <!-- Toggle importação -->
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:14px;cursor:pointer;">
-              <input type="checkbox" id="lote-eh-import" />
-              Este lote é de importação — calcular custo tributário real
-            </label>
-
-            <!-- Parâmetros de importação -->
-            <div id="lote-import-params" style="display:none;">
-              <div style="background:#fff8f5;border:1px solid #f0d0c0;border-radius:8px;padding:16px;margin-bottom:14px;">
-                <p style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;">
-                  Parâmetros de Importação — NCM 8526.91.00
-                </p>
-
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>FOB (USD) *</label>
-                    <input type="number" id="lote-fob" step="0.01" placeholder="2500.00" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Frete Internacional (USD) *</label>
-                    <input type="number" id="lote-frete" step="0.01" placeholder="595.00" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Seguro Internacional (USD)</label>
-                    <input type="number" id="lote-seguro" step="0.01" placeholder="10.00" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Taxa de Câmbio (R$/USD) *</label>
-                    <div style="display:flex;gap:6px;">
-                      <input type="number" id="lote-cambio" step="0.0001" placeholder="5.00" style="flex:1;" oninput="window._previewCustoLote()" />
-                      <button type="button" class="btn btn-sm" style="background:#f0ede6;border:1px solid var(--border);white-space:nowrap;" onclick="window._buscarCambio()">
-                        BCB hoje
-                      </button>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Alíq. II (%)</label>
-                    <input type="number" id="lote-ii" step="0.01" value="0" placeholder="0" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Alíq. IPI (%) ⚠️</label>
-                    <input type="number" id="lote-ipi" step="0.01" value="13" placeholder="13" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Alíq. PIS (%)</label>
-                    <input type="number" id="lote-pis" step="0.001" value="2.1" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Alíq. COFINS (%)</label>
-                    <input type="number" id="lote-cofins" step="0.001" value="9.65" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Alíq. ICMS-PA (%) — por dentro</label>
-                    <input type="number" id="lote-icms" step="0.01" value="19" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Custos Operacionais Lote (R$)</label>
-                    <input type="number" id="lote-custos-op" step="0.01" placeholder="2136.79" oninput="window._previewCustoLote()" />
-                  </div>
-                  <div class="form-group">
-                    <label>Alíq. Simples Nacional (%)</label>
-                    <input type="number" id="lote-simples" step="0.01" value="4" oninput="window._previewCustoLote()" />
-                  </div>
-                </div>
-
-                <!-- Preview custo do lote -->
-                <div id="lote-custo-preview" style="display:none;margin-top:14px;border-top:1px solid #f0d0c0;padding-top:14px;">
-                  <p style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Composição do Custo por Unidade</p>
-                  <div id="lote-custo-preview-content" style="font-size:13px;font-family:'Fira Code',monospace;"></div>
-                </div>
+              <div class="form-group"><label>Nome da Empresa *</label><input type="text" id="cli-nome" placeholder="Nome do cliente / empresa" required/></div>
+              <div class="form-group"><label>Nome do Contato</label><input type="text" id="cli-nome-contato" placeholder="Ex: João Silva"/></div>
+              <div class="form-group"><label>CPF / CNPJ</label><input type="text" id="cli-cpf-cnpj" placeholder="000.000.000-00 ou 00.000.000/0001-00"/></div>
+              <div class="form-group"><label>Telefone / E-mail</label><input type="text" id="cli-contato" placeholder="Telefone ou e-mail"/></div>
+              <div class="form-group"><label>Endereço</label><input type="text" id="cli-local" placeholder="R. das Flores, 100, Centro"/></div>
+              <div class="form-group"><label>CEP</label><input type="text" id="cli-cep" placeholder="00000-000"/></div>
+              <div class="form-group"><label>Município</label><input type="text" id="cli-municipio" placeholder="Ex: Belém"/></div>
+              <div class="form-group"><label>UF</label>
+                <select id="cli-uf">
+                  <option value="PA" selected>PA</option>
+                  <option value="AC">AC</option><option value="AL">AL</option><option value="AM">AM</option>
+                  <option value="AP">AP</option><option value="BA">BA</option><option value="CE">CE</option>
+                  <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+                  <option value="MA">MA</option><option value="MG">MG</option><option value="MS">MS</option>
+                  <option value="MT">MT</option><option value="PE">PE</option><option value="PI">PI</option>
+                  <option value="PR">PR</option><option value="RJ">RJ</option><option value="RN">RN</option>
+                  <option value="RO">RO</option><option value="RR">RR</option><option value="RS">RS</option>
+                  <option value="SC">SC</option><option value="SE">SE</option><option value="SP">SP</option>
+                  <option value="TO">TO</option>
+                </select>
               </div>
             </div>
-
-            <!-- Custo manual (quando não é importação) -->
-            <div id="lote-custo-manual-wrap">
-              <div class="form-group" style="max-width:220px;">
-                <label>Custo Unitário Manual (R$) *</label>
-                <input type="number" id="lote-custo" step="0.01" placeholder="0,00" />
-              </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">+ Criar Lote</button>
+            <button type="submit" class="btn btn-primary">+ Adicionar Cliente</button>
           </form>
         </div>
-
-        <!-- Painel de escaneamento -->
-        <div id="painel-entrada" style="display:none;" class="card" style="margin-bottom:20px;">
-          <div id="lote-ativo-info" style="display:none;background:#fff0e8;color:var(--accent);border-radius:7px;padding:9px 14px;font-weight:600;font-size:13px;margin-bottom:16px;"></div>
-
-          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">Registrar Aparelhos no Lote</h3>
-
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
-            <button id="btn-start-scanner-entrada" class="btn btn-primary" onclick="window._iniciarScannerEntrada()">
-              📷 Usar Câmera
-            </button>
-            <button id="btn-stop-scanner-entrada" class="btn btn-primary" style="display:none;background:var(--danger);" onclick="window._pararScannerEntrada()">
-              ⏹ Parar Câmera
-            </button>
-          </div>
-
-          <div id="qr-reader-entrada" style="display:none;max-width:340px;margin-bottom:14px;border-radius:8px;overflow:hidden;"></div>
-
-          <div id="estoque-entrada-manual" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-            <div class="form-group" style="flex:1;min-width:200px;margin:0;">
-              <label>Ou digite / cole o código</label>
-              <input type="text" id="codigo-manual-entrada" placeholder="Código de barras ou QR" autocomplete="off" />
-            </div>
-            <button class="btn btn-primary" onclick="window._registrarManual()">Registrar</button>
-          </div>
-
-          <div id="codigos-escaneados" style="display:flex;flex-direction:column;gap:6px;margin-top:16px;max-height:220px;overflow-y:auto;"></div>
-        </div>
-
-        <!-- Lista de lotes -->
         <div class="card">
-          <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Lotes Cadastrados</h3>
-          <div id="estoque-lista">
-            <p class="empty-state">Carregando...</p>
+          <div class="card-title">Clientes Cadastrados</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Cliente</th><th>Responsável</th><th>Localidade</th><th>Contato</th><th></th></tr></thead>
+              <tbody id="clientes-tbody"><tr><td colspan="5" class="empty-state">Carregando...</td></tr></tbody>
+            </table>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- TAB: SAÍDAS -->
-      <div id="etab-saidas" class="etab-content" style="display:none;">
-        <div id="estoque-alert-saida" class="alert"></div>
-
-        <div class="card">
-          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">Escanear Aparelho para Saída</h3>
-
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
-            <button id="btn-start-scanner-saida" class="btn btn-primary" onclick="window._iniciarScannerSaida()">
-              📷 Usar Câmera
-            </button>
-            <button id="btn-stop-scanner-saida" class="btn btn-primary" style="display:none;background:var(--danger);" onclick="window._pararScannerSaida()">
-              ⏹ Parar Câmera
-            </button>
-          </div>
-
-          <div id="qr-reader-saida" style="display:none;max-width:340px;margin-bottom:14px;border-radius:8px;overflow:hidden;"></div>
-
-          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-            <div class="form-group" style="flex:1;min-width:200px;margin:0;">
-              <label>Ou digite / cole o código</label>
-              <input type="text" id="codigo-manual-saida" placeholder="Código do aparelho" autocomplete="off" />
+      <!-- VENDAS -->
+      <section class="section" id="section-vendas">
+        <div class="page-header"><div><h2>Vendas</h2><p>Registre vendas e parcelas</p></div></div>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">Nova Venda</div>
+          <div id="vendas-alert" class="alert"></div>
+          <form id="form-venda">
+            <div class="form-grid">
+              <div class="form-group"><label>Cliente *</label><select id="venda-cliente" required><option value="">Selecione um cliente...</option></select></div>
+              <div class="form-group"><label>Lote / Produto *</label><select id="venda-lote" required onchange="window._selecionarLote(this.value)"><option value="">Selecione o lote...</option></select></div>
+              <div class="form-group"><label>Data da Venda *</label><input type="date" id="venda-data" required/></div>
+              <div class="form-group"><label>Quantidade *</label><input type="number" id="venda-qtd" min="1" placeholder="Ex: 10" required/></div>
+              <div class="form-group"><label>Custo Unit. Real (R$)</label><input type="number" id="venda-custo" min="0" step="0.01" placeholder="0,00" readonly/></div>
+              <div class="form-group"><label>Preço de Venda Unit. (R$) *</label><input type="number" id="venda-preco" min="0.01" step="0.01" placeholder="0,00" required/></div>
+              <div class="form-group"><label>Nº de Parcelas *</label>
+                <select id="venda-parcelas" required>
+                  <option value="1">1x (à vista)</option><option value="2">2x</option><option value="3">3x</option>
+                  <option value="4">4x</option><option value="5">5x</option><option value="6">6x</option><option value="12">12x</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Vencimento 1ª Parcela *</label><input type="date" id="venda-venc" required/></div>
+              <div class="form-group"><label>Observação</label><input type="text" id="venda-obs" placeholder="Opcional"/></div>
             </div>
-            <button class="btn btn-primary" onclick="window._buscarManualSaida()">Buscar</button>
+            <div id="venda-breakdown" style="display:none;margin-bottom:16px;"></div>
+            <button type="submit" class="btn btn-primary">+ Registrar Venda</button>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-title">Vendas Registradas</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data</th><th>Cliente</th><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Total</th><th>Lucro</th><th>Parcelas</th><th>NF-e</th><th></th></tr></thead>
+              <tbody id="vendas-tbody"><tr><td colspan="8" class="empty-state">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CUSTOS FIXOS -->
+      <section class="section" id="section-custos">
+        <div class="page-header"><div><h2>Custos Fixos</h2><p>Despesas mensais recorrentes</p></div></div>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">Adicionar Custo</div>
+          <div id="custos-alert" class="alert"></div>
+          <form id="form-custo">
+            <div class="form-grid">
+              <div class="form-group"><label>Descrição *</label><input type="text" id="custo-nome" placeholder="Ex: Aluguel, Internet..." required/></div>
+              <div class="form-group"><label>Valor Mensal (R$) *</label><input type="number" id="custo-valor" min="0.01" step="0.01" placeholder="0,00" required/></div>
+            </div>
+            <button type="submit" class="btn btn-primary">+ Adicionar</button>
+          </form>
+        </div>
+        <div class="card">
+          <div id="custos-lista"><p class="empty-state">Carregando...</p></div>
+          <hr class="section-divider"/>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:700;font-size:14px;">Total Mensal</span>
+            <span class="money money-red" id="custos-total" style="font-size:22px;font-family:'JetBrains Mono',monospace;font-weight:700;">—</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJETOR DE LUCRO -->
+      <section class="section" id="section-projetor">
+        <div class="page-header"><div><h2>Projetor de Lucro</h2><p>Simule cenários sem salvar no banco</p></div></div>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">Parâmetros</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Quantidade de Aparelhos</label><input type="number" id="proj-qtd" min="1" placeholder="Ex: 20"/></div>
+            <div class="form-group"><label>Custo por Aparelho (R$)</label><input type="number" id="proj-custo" min="0" step="0.01" placeholder="0,00"/></div>
+            <div class="form-group"><label>Preço de Venda (R$)</label><input type="number" id="proj-preco" min="0.01" step="0.01" placeholder="0,00"/></div>
+            <div class="form-group"><label>Número de Parcelas</label>
+              <select id="proj-parcelas">
+                <option value="1">1x</option><option value="2">2x</option><option value="3">3x</option>
+                <option value="4">4x</option><option value="5">5x</option><option value="6">6x</option><option value="12">12x</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Mês de Início (1ª Parcela)</label><input type="month" id="proj-inicio"/></div>
+            <div class="form-group" style="justify-content:flex-end;padding-bottom:4px;">
+              <label style="text-transform:none;font-size:13px;display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" id="proj-desc-custos"/> Descontar custos fixos mensais
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="projetor-resultado" id="proj-resultado-frase"><span id="proj-frase"></span></div>
+        <div id="proj-resultados" style="display:none;">
+          <div class="kpi-grid" style="margin-bottom:20px;">
+            <div class="kpi-card"><div class="kpi-label">Investimento Total</div><div class="kpi-value" id="proj-kpi-invest">—</div></div>
+            <div class="kpi-card"><div class="kpi-label">Receita Bruta Total</div><div class="kpi-value" id="proj-kpi-bruta">—</div></div>
+            <div class="kpi-card success"><div class="kpi-label">Lucro Bruto</div><div class="kpi-value" id="proj-kpi-lucro">—</div></div>
+            <div class="kpi-card"><div class="kpi-label">Margem</div><div class="kpi-value" id="proj-kpi-margem">—</div></div>
+            <div class="kpi-card accent"><div class="kpi-label">Parcela/Mês (bruta)</div><div class="kpi-value" id="proj-kpi-parcela">—</div></div>
+            <div class="kpi-card"><div class="kpi-label">Receita Líquida/Mês</div><div class="kpi-value" id="proj-kpi-liquida">—</div></div>
+            <div class="kpi-card success"><div class="kpi-label">Lucro por Parcela</div><div class="kpi-value" id="proj-kpi-lucro-parc">—</div></div>
+            <div class="kpi-card"><div class="kpi-label">Margem Líquida/Parcela</div><div class="kpi-value" id="proj-kpi-margem-parc">—</div></div>
+          </div>
+          <div class="charts-grid" style="margin-bottom:20px;">
+            <div class="chart-card"><h3>Receita Bruta vs Líquida por Mês</h3><div class="chart-wrap"><canvas id="proj-chart-barras"></canvas></div></div>
+            <div class="chart-card"><h3>Caixa Acumulado</h3><div class="chart-wrap"><canvas id="proj-chart-linha"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Projeção Mês a Mês</div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Mês</th><th>Valor Parcela</th><th>Custo Produto</th><th>Custos Fixos</th><th>Lucro da Parcela</th><th>Margem %</th><th>Acumulado</th></tr></thead>
+                <tbody id="proj-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FLUXO DE CAIXA -->
+      <section class="section" id="section-fluxo">
+        <div class="page-header"><div><h2>Fluxo de Caixa</h2><p>Baseado nas parcelas reais cadastradas</p></div></div>
+        <div class="kpi-grid">
+          <div class="kpi-card accent"><div class="kpi-label">Receita Total Projetada</div><div class="kpi-value" id="fluxo-kpi-total">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Melhor Mês</div><div class="kpi-value" style="font-size:16px;" id="fluxo-kpi-melhor">—</div></div>
+          <div class="kpi-card warning"><div class="kpi-label">Custos Fixos/Mês</div><div class="kpi-value" id="fluxo-kpi-custos">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Meses com Receita</div><div class="kpi-value" id="fluxo-kpi-meses">—</div></div>
+        </div>
+        <div class="chart-card" style="margin:20px 0;">
+          <h3>Receita Mensal</h3>
+          <div class="chart-wrap" style="height:220px;"><canvas id="fluxo-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Timeline por Cliente</div>
+          <div id="fluxo-timeline"><p class="empty-state">Carregando...</p></div>
+        </div>
+      </section>
+
+      <!-- ESTOQUE -->
+      <section class="section" id="section-estoque">
+        <div class="page-header"><div><h2>Estoque</h2><p>Controle de lotes e aparelhos individuais</p></div></div>
+        <div class="estoque-tabs">
+          <button class="etab active" data-tab="etab-lotes">Lotes / Entradas</button>
+          <button class="etab" data-tab="etab-saidas">Dar Baixa (Saída)</button>
+        </div>
+
+        <div id="etab-lotes" class="etab-content active">
+          <div id="estoque-alert" class="alert"></div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title">Novo Lote de Entrada</div>
+            <form id="form-lote">
+              <div class="form-grid">
+                <div class="form-group"><label>Produto *</label><input type="text" id="lote-nome" placeholder="Ex: Rastreador X16" required/></div>
+                <div class="form-group"><label>Data de Entrada *</label><input type="date" id="lote-data" required/></div>
+                <div class="form-group"><label>Quantidade do Lote *</label><input type="number" id="lote-qtd" min="1" placeholder="Ex: 500" required/></div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-3);margin-bottom:14px;cursor:pointer;">
+                <input type="checkbox" id="lote-eh-import"/> Este lote é de importação — calcular custo tributário real
+              </label>
+              <div id="lote-import-params" style="display:none;">
+                <div class="import-section-label">Parâmetros de Importação — NCM 8526.91.00</div>
+                <div class="form-grid">
+                  <div class="form-group"><label>FOB (USD) *</label><input type="number" id="lote-fob" step="0.01" placeholder="2500.00" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Frete Internacional (USD) *</label><input type="number" id="lote-frete" step="0.01" placeholder="595.00" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Seguro Internacional (USD)</label><input type="number" id="lote-seguro" step="0.01" placeholder="10.00" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Taxa de Câmbio (R$/USD) *</label>
+                    <div style="display:flex;gap:6px;">
+                      <input type="number" id="lote-cambio" step="0.0001" placeholder="5.00" style="flex:1;" oninput="window._previewCustoLote()"/>
+                      <button type="button" class="btn btn-ghost btn-sm" onclick="window._buscarCambio()">BCB hoje</button>
+                    </div>
+                  </div>
+                  <div class="form-group"><label>Alíq. II (%)</label><input type="number" id="lote-ii" step="0.01" value="0" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Alíq. IPI (%) ⚠️</label><input type="number" id="lote-ipi" step="0.01" value="13" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Alíq. PIS (%)</label><input type="number" id="lote-pis" step="0.001" value="2.1" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Alíq. COFINS (%)</label><input type="number" id="lote-cofins" step="0.001" value="9.65" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Alíq. ICMS-PA (%) — por dentro</label><input type="number" id="lote-icms" step="0.01" value="19" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Custos Operacionais Lote (R$)</label><input type="number" id="lote-custos-op" step="0.01" placeholder="2136.79" oninput="window._previewCustoLote()"/></div>
+                  <div class="form-group"><label>Alíq. Simples Nacional (%)</label><input type="number" id="lote-simples" step="0.01" value="4" oninput="window._previewCustoLote()"/></div>
+                </div>
+                <div id="lote-custo-preview" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+                  <div class="card-title">Composição do Custo por Unidade</div>
+                  <div id="lote-custo-preview-content" style="font-size:13px;font-family:'JetBrains Mono',monospace;"></div>
+                </div>
+              </div>
+              <div id="lote-custo-manual-wrap">
+                <div class="form-group" style="max-width:220px;">
+                  <label>Custo Unitário Manual (R$) *</label>
+                  <input type="number" id="lote-custo" step="0.01" placeholder="0,00"/>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top:8px;">+ Criar Lote</button>
+            </form>
           </div>
 
-          <div id="saida-resultado"></div>
-        </div>
-      </div>
-    </section>
+          <div id="painel-entrada" style="display:none;" class="card" style="margin-bottom:20px;">
+            <div id="lote-ativo-info"></div>
+            <div class="card-title">Registrar Aparelhos no Lote</div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+              <button id="btn-start-scanner-entrada" class="btn btn-primary" onclick="window._iniciarScannerEntrada()">📷 Usar Câmera</button>
+              <button id="btn-stop-scanner-entrada" class="btn btn-primary" style="display:none;background:var(--danger);" onclick="window._pararScannerEntrada()">⏹ Parar Câmera</button>
+            </div>
+            <div id="qr-reader-entrada"></div>
+            <div id="estoque-entrada-manual" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+              <div class="form-group" style="flex:1;min-width:200px;margin:0;">
+                <label>Ou digite / cole o código</label>
+                <input type="text" id="codigo-manual-entrada" placeholder="Código de barras ou QR" autocomplete="off"/>
+              </div>
+              <button class="btn btn-primary" onclick="window._registrarManual()">Registrar</button>
+            </div>
+            <div id="codigos-escaneados" style="display:flex;flex-direction:column;gap:6px;margin-top:16px;max-height:220px;overflow-y:auto;"></div>
+          </div>
 
-  </main>
-</div>
+          <div class="card">
+            <div class="card-title">Lotes Cadastrados</div>
+            <div id="estoque-lista"><p class="empty-state">Carregando...</p></div>
+          </div>
+        </div>
+
+        <div id="etab-saidas" class="etab-content" style="display:none;">
+          <div id="estoque-alert-saida" class="alert"></div>
+          <div class="card">
+            <div class="card-title">Escanear Aparelho para Saída</div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+              <button id="btn-start-scanner-saida" class="btn btn-primary" onclick="window._iniciarScannerSaida()">📷 Usar Câmera</button>
+              <button id="btn-stop-scanner-saida" class="btn btn-primary" style="display:none;background:var(--danger);" onclick="window._pararScannerSaida()">⏹ Parar Câmera</button>
+            </div>
+            <div id="qr-reader-saida"></div>
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+              <div class="form-group" style="flex:1;min-width:200px;margin:0;">
+                <label>Ou digite / cole o código</label>
+                <input type="text" id="codigo-manual-saida" placeholder="Código do aparelho" autocomplete="off"/>
+              </div>
+              <button class="btn btn-primary" onclick="window._buscarManualSaida()">Buscar</button>
+            </div>
+            <div id="saida-resultado"></div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /content-wrap -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <!-- MODAL FICHA DO CLIENTE -->
 <div id="modal-ficha" class="modal-overlay" onclick="if(event.target===this)window._fecharFichaCliente()">
@@ -707,9 +445,8 @@
     previewCustoLote, buscarCambioHoje
   } from './js/estoque.js'
 
-  window._previewCustoLote = previewCustoLote
-  window._buscarCambio     = buscarCambioHoje
-
+  window._previewCustoLote      = previewCustoLote
+  window._buscarCambio          = buscarCambioHoje
   window._iniciarScannerEntrada = iniciarScannerEntrada
   window._pararScannerEntrada   = pararScannerEntrada
   window._iniciarScannerSaida   = iniciarScannerSaida
@@ -726,11 +463,19 @@
     await buscarAparelhoPorCodigo(input.value)
   }
 
-  // Verifica sessão
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) window.location.href = 'index.html'
 
-  // Navegação
+  const headerTitles = {
+    dashboard: ['Dashboard', 'Visão geral do negócio'],
+    clientes:  ['Clientes', 'Gerencie sua carteira de clientes'],
+    vendas:    ['Vendas', 'Registre vendas e parcelas'],
+    custos:    ['Custos Fixos', 'Despesas mensais recorrentes'],
+    projetor:  ['Projetor de Lucro', 'Simule cenários sem salvar no banco'],
+    fluxo:     ['Fluxo de Caixa', 'Baseado nas parcelas reais cadastradas'],
+    estoque:   ['Estoque', 'Controle de lotes e aparelhos individuais'],
+  }
+
   const navItems = document.querySelectorAll('.nav-item')
   const sections = document.querySelectorAll('.section')
 
@@ -741,8 +486,9 @@
       sections.forEach(s => s.classList.remove('active'))
       item.classList.add('active')
       document.getElementById(`section-${target}`).classList.add('active')
-
-      // Carrega dados ao mudar de aba
+      const [t, s] = headerTitles[target] || [target, '']
+      document.getElementById('hdr-title').textContent = t
+      document.getElementById('hdr-sub').textContent = s
       if (target === 'dashboard') await carregarDashboard()
       if (target === 'clientes') await carregarClientes()
       if (target === 'vendas') { await carregarClientes(); await carregarVendas(); await carregarLotesParaVenda() }
@@ -752,10 +498,9 @@
     })
   })
 
-  // Logout
   document.getElementById('btnLogout').addEventListener('click', logout)
+  document.getElementById('btnLogoutVisible').addEventListener('click', logout)
 
-  // Form: Clientes
   document.getElementById('form-cliente').addEventListener('submit', async (e) => {
     e.preventDefault()
     const ok = await adicionarCliente({
@@ -771,40 +516,35 @@
     if (ok) e.target.reset()
   })
 
-  // Form: Vendas + preview
   const vendaInputs = ['venda-qtd', 'venda-preco', 'venda-parcelas']
   vendaInputs.forEach(id => document.getElementById(id)?.addEventListener('input', previewVenda))
 
   document.getElementById('form-venda').addEventListener('submit', async (e) => {
     e.preventDefault()
     const dados = {
-      cliente_id: document.getElementById('venda-cliente').value,
-      lote_id: document.getElementById('venda-lote').value,
-      data: document.getElementById('venda-data').value,
-      qtd: document.getElementById('venda-qtd').value,
-      custo_unit: document.getElementById('venda-custo').value,
-      preco_unit: document.getElementById('venda-preco').value,
+      cliente_id:   document.getElementById('venda-cliente').value,
+      lote_id:      document.getElementById('venda-lote').value,
+      data:         document.getElementById('venda-data').value,
+      qtd:          document.getElementById('venda-qtd').value,
+      custo_unit:   document.getElementById('venda-custo').value,
+      preco_unit:   document.getElementById('venda-preco').value,
       num_parcelas: document.getElementById('venda-parcelas').value,
-      venc_primeira: document.getElementById('venda-venc').value,
-      obs: document.getElementById('venda-obs').value
+      venc_primeira:document.getElementById('venda-venc').value,
+      obs:          document.getElementById('venda-obs').value
     }
     const ok = await adicionarVenda(dados)
-    if (ok) {
-      e.target.reset()
-      document.getElementById('venda-preview').style.display = 'none'
-    }
-  })
-
-  // Form: Custos
-  document.getElementById('form-custo').addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const nome = document.getElementById('custo-nome').value
-    const valor = document.getElementById('custo-valor').value
-    const ok = await adicionarCusto(nome, valor)
     if (ok) e.target.reset()
   })
 
-  // Toggle importação no form de lote
+  document.getElementById('form-custo').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const ok = await adicionarCusto(
+      document.getElementById('custo-nome').value,
+      document.getElementById('custo-valor').value
+    )
+    if (ok) e.target.reset()
+  })
+
   document.getElementById('lote-eh-import').addEventListener('change', (e) => {
     const show = e.target.checked
     document.getElementById('lote-import-params').style.display = show ? 'block' : 'none'
@@ -812,16 +552,13 @@
     document.getElementById('lote-custo').required = !show
   })
 
-  // Form: Lote
   document.getElementById('form-lote').addEventListener('submit', async (e) => {
     e.preventDefault()
     const ehImport = document.getElementById('lote-eh-import').checked
-    const nome  = document.getElementById('lote-nome').value
-    const data  = document.getElementById('lote-data').value
-    const qtd   = document.getElementById('lote-qtd').value
-
+    const nome = document.getElementById('lote-nome').value
+    const data = document.getElementById('lote-data').value
+    const qtd  = document.getElementById('lote-qtd').value
     let params = { ehImport: false, custo_unit: Number(document.getElementById('lote-custo').value || 0) }
-
     if (ehImport) {
       params = {
         ehImport: true,
@@ -829,16 +566,15 @@
         freteInternacional_USD:  Number(document.getElementById('lote-frete').value || 0),
         seguroInternacional_USD: Number(document.getElementById('lote-seguro').value || 0),
         taxaCambio:              Number(document.getElementById('lote-cambio').value || 0),
-        aliqII:    Number(document.getElementById('lote-ii').value || 0) / 100,
-        aliqIPI:   Number(document.getElementById('lote-ipi').value || 0) / 100,
-        aliqPIS:   Number(document.getElementById('lote-pis').value || 0) / 100,
-        aliqCOFINS:Number(document.getElementById('lote-cofins').value || 0) / 100,
-        aliqICMS:  Number(document.getElementById('lote-icms').value || 0) / 100,
-        custosOpLote: Number(document.getElementById('lote-custos-op').value || 0),
-        aliqSimples:  Number(document.getElementById('lote-simples').value || 0) / 100,
+        aliqII:      Number(document.getElementById('lote-ii').value || 0) / 100,
+        aliqIPI:     Number(document.getElementById('lote-ipi').value || 0) / 100,
+        aliqPIS:     Number(document.getElementById('lote-pis').value || 0) / 100,
+        aliqCOFINS:  Number(document.getElementById('lote-cofins').value || 0) / 100,
+        aliqICMS:    Number(document.getElementById('lote-icms').value || 0) / 100,
+        custosOpLote:Number(document.getElementById('lote-custos-op').value || 0),
+        aliqSimples: Number(document.getElementById('lote-simples').value || 0) / 100,
       }
     }
-
     const lote = await criarLote(nome, data, Number(qtd), params)
     if (lote) {
       e.target.reset()
@@ -849,18 +585,15 @@
     }
   })
 
-  // Enter no input manual de entrada
   document.getElementById('codigo-manual-entrada')?.addEventListener('keydown', async (e) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      const input = e.target
-      if (!input.value.trim()) return
-      const ok = await registrarAparelho(input.value)
-      if (ok) input.value = ''
+      if (!e.target.value.trim()) return
+      const ok = await registrarAparelho(e.target.value)
+      if (ok) e.target.value = ''
     }
   })
 
-  // Enter no input manual de saída
   document.getElementById('codigo-manual-saida')?.addEventListener('keydown', async (e) => {
     if (e.key === 'Enter') {
       e.preventDefault()
@@ -868,7 +601,6 @@
     }
   })
 
-  // Tabs do estoque
   document.querySelectorAll('.etab').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.etab').forEach(b => b.classList.remove('active'))
@@ -878,10 +610,7 @@
     })
   })
 
-  // Init projetor
   initProjetor()
-
-  // Carrega dashboard ao iniciar
   await carregarDashboard()
 </script>
 </body>
