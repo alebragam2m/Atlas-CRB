@@ -28,7 +28,7 @@ export async function emitirNFe(vendaId) {
     })
     const data = await resp.json()
 
-    if (!resp.ok) throw new Error(data.error || data.mensagem || `HTTP ${resp.status}`)
+    if (!resp.ok) throw new Error(data.error || data.mensagem || data.message || `HTTP ${resp.status}`)
 
     const ref = data.ref
     await supabase.from('vendas').update({ nfe_ref: ref, nfe_status: 'processando' }).eq('id', vendaId)

@@ -135,6 +135,12 @@ module.exports = async (req, res) => {
 
   try {
     const result = await httpRequest('POST', BASE_URL, `/v2/nfe?ref=${ref}`, token, JSON.stringify(nfe))
+    if (result.status === 401) {
+      return res.status(401).json({
+        error: `Token inválido ou sem permissão (401). Ambiente: ${BASE_URL}. Verifique FOCUSNFE_TOKEN no Vercel.`,
+        focusnfe_response: result.body
+      })
+    }
     return res.status(result.status).json({ ref, ...result.body })
   } catch (err) {
     return res.status(500).json({ error: err.message })
