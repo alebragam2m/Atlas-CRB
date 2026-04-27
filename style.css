@@ -27,6 +27,11 @@
   --radius-lg:  14px;
   --shadow:     0 1px 3px oklch(0 0 0 / .06), 0 1px 2px oklch(0 0 0 / .04);
   --shadow-md:  0 4px 12px oklch(0 0 0 / .08), 0 2px 4px oklch(0 0 0 / .04);
+
+  /* Aliases para compatibilidade com inline styles nos arquivos JS */
+  --text-muted: var(--text-3);
+  --white:      var(--surface);
+  --card-shadow: var(--shadow);
 }
 
 body {
